@@ -6,7 +6,6 @@ import { Contract } from "ethers";
 import '@nomiclabs/hardhat-ethers'
 
 // npx hardhat test 
-// testing comment
 
 describe("Basic Dutch Auction", function () {
   // We define a fixture to reuse the same setup in every test.
