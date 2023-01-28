@@ -7,6 +7,7 @@
 // initialPrice = reservePrice + numBlocksAuctionOpen * offerPriceDecrement
 
 // npx hardhat compile
+// REPORT_GAS=true npx hardhat test
 
 pragma solidity ^0.8.17;
 

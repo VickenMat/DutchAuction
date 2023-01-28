@@ -1,8 +1,4 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
+This project creates a Dutch Auction in which the seller instantiates a contract to manage the auction of a single item at a single auction event. The seller is the owner of the contract and the auction begins at the block in which the contract is created. Bids can be submitted by an externally owned Ethereum account. The first bid processed by the contract that sends wei greater than or equal to the current price is the winner. The wei should be transferred immediately to the seller and the contract should not accept any more bids. All bids besides the winning bid will be refunded immediately.
 
 ```shell
 npx hardhat help
