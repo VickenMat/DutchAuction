@@ -23,11 +23,6 @@ describe("Basic Dutch Auction", function () {
   }
 
   describe("Token Deployment", function () {
-    it("Checking total token supply", async function () {
-      const { token, owner } = await loadFixture(deployBasicDutchAuctionFixture);
-
-      expect (await token.totalSupply()).to.equal(5000);
-    }); 
 
     it('Bidding test', async function(){
 

@@ -19,13 +19,17 @@ contract BasicDutchAuction {
     uint256 public offerPriceDecrement;
     uint256 public initialPrice;
 
-    uint256 public totalSupply; // used for testing
+    // new
+    address payable[] public bidders;
+    uint256 public blocks_elapsed;
+
+    // uint256 public totalSupply; // used for testing
     mapping(address => uint256) public balances; // public key
 
     // variables below is from chat gpt
     uint256 public highestBid;
     uint256 public blockStart;
-    address payable public seller;
+    address payable public immutable seller;
     address payable public highestBidder;
 
     // constructor which initializes 5 variables
@@ -43,16 +47,20 @@ contract BasicDutchAuction {
         numBlocksAuctionOpen = _numBlocksAuctionOpen;
         offerPriceDecrement = _offerPriceDecrement;
 
-        // from professors lecture
-        totalSupply = 5000; // set total supply to 5,000
-        // give creator of contract total supply of tokens
-        balances[msg.sender] = totalSupply; // msg.sender represents the account used to call this constructor/create this contract
-
-        // chat gpt variables below
+        // make sure that the starting price is greater than the num of blocks * price decrement
+        require(
+            initialPrice >= _numBlocksAuctionOpen * _offerPriceDecrement,
+            "starting price must be greater than the lowest the seller would be willing to go"
+        );
         // assigning seller to the person who's currently connecting with the contract
         seller = payable(msg.sender);
-        // assigns the starting block as the number x in the chain
+        // assigns the starting block as the current block
         blockStart = block.number;
+    }
+
+    // returns the initial price
+    function getPrice() public view returns (uint256) {
+        return initialPrice;
     }
 
     /* testing function to return total supply
@@ -71,11 +79,19 @@ contract BasicDutchAuction {
         balances[to] += amount;
     }
 
+    // new
+    function getBidders() public view returns (address payable[] memory) {
+        return bidders;
+    }
+
     // allows users to submit a bid on the auction
     // bids can be submitted by an externally owned ETH wallet
     function bid() public payable {
         // returns (address) - add this after payable and before {}
         // return address(0); // returns the address of the winner?
+
+        // checks to see how many blocks has elapsed in the current auction
+        blocks_elapsed = block.number - blockStart;
 
         // everything here and down is chat gpt code
         // require is used to verify inputs and conditions before execution
