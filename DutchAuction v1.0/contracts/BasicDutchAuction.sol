@@ -21,9 +21,7 @@ contract BasicDutchAuction {
 
     // new
     address payable[] public bidders;
-    uint256 public blocks_elapsed;
 
-    // uint256 public totalSupply; // used for testing
     mapping(address => uint256) public balances; // public key
 
     // variables below is from chat gpt
@@ -52,6 +50,7 @@ contract BasicDutchAuction {
             initialPrice >= _numBlocksAuctionOpen * _offerPriceDecrement,
             "starting price must be greater than the lowest the seller would be willing to go"
         );
+
         // assigning seller to the person who's currently connecting with the contract
         seller = payable(msg.sender);
         // assigns the starting block as the current block
@@ -59,8 +58,16 @@ contract BasicDutchAuction {
     }
 
     // returns the initial price
-    function getPrice() public view returns (uint256) {
-        return initialPrice;
+    function getInitialPrice() public view returns (uint256) {
+        uint256 startPrice = reservePrice +
+            numBlocksAuctionOpen *
+            offerPriceDecrement;
+        return startPrice;
+    }
+
+    // returns amount of blocks elapsed including genesis block
+    function blocksElapsed() public view returns (uint256) {
+        return block.number - blockStart;
     }
 
     /* testing function to return total supply
@@ -79,7 +86,7 @@ contract BasicDutchAuction {
         balances[to] += amount;
     }
 
-    // new
+    // not fully functioning but supposed to return list of bidder's address
     function getBidders() public view returns (address payable[] memory) {
         return bidders;
     }
@@ -90,8 +97,8 @@ contract BasicDutchAuction {
         // returns (address) - add this after payable and before {}
         // return address(0); // returns the address of the winner?
 
-        // checks to see how many blocks has elapsed in the current auction
-        blocks_elapsed = block.number - blockStart;
+        // allows for tracking and listing of all addresses who have intereacted with this contract
+        bidders.push(payable(msg.sender));
 
         // everything here and down is chat gpt code
         // require is used to verify inputs and conditions before execution
