@@ -14,21 +14,21 @@ pragma solidity ^0.8.17;
 // creates a contract
 contract BasicDutchAuction {
     // initializing variables to be used in constructor
-    uint256 public reservePrice;
-    uint256 public numBlocksAuctionOpen;
-    uint256 public offerPriceDecrement;
-    uint256 public initialPrice;
+    uint256 immutable reservePrice;
+    uint256 immutable numBlocksAuctionOpen;
+    uint256 immutable offerPriceDecrement;
+    uint256 immutable initialPrice;
 
-    // new
-    address payable[] public bidders;
+    address public buyer;
+    address payable public immutable seller;
+    address payable public winner;
 
+    // maybe not needed
     mapping(address => uint256) public balances; // public key
 
     // variables below is from chat gpt
     uint256 public highestBid;
     uint256 public blockStart;
-    address payable public immutable seller;
-    address payable public highestBidder;
 
     // constructor which initializes 5 variables
     constructor(
@@ -45,10 +45,10 @@ contract BasicDutchAuction {
         numBlocksAuctionOpen = _numBlocksAuctionOpen;
         offerPriceDecrement = _offerPriceDecrement;
 
-        // make sure that the starting price is greater than the num of blocks * price decrement
+        // check that the starting price is greater than the num of blocks * price decrement
         require(
-            initialPrice >= _numBlocksAuctionOpen * _offerPriceDecrement,
-            "starting price must be greater than the lowest the seller would be willing to go"
+            _reservePrice >= _numBlocksAuctionOpen * _offerPriceDecrement,
+            "Reserve price must be greater than initial price"
         );
 
         // assigning seller to the person who's currently connecting with the contract
@@ -56,26 +56,6 @@ contract BasicDutchAuction {
         // assigns the starting block as the current block
         blockStart = block.number;
     }
-
-    // returns the initial price
-    function getInitialPrice() public view returns (uint256) {
-        uint256 startPrice = reservePrice +
-            numBlocksAuctionOpen *
-            offerPriceDecrement;
-        return startPrice;
-    }
-
-    // returns amount of blocks elapsed including genesis block
-    function blocksElapsed() public view returns (uint256) {
-        return block.number - blockStart;
-    }
-
-    /* testing function to return total supply
-    // dont NEED this anymore now that it's public
-    function getTotalSupply() public view returns (uint256) {
-        return totalSupply;
-    }
-    */
 
     // professors lecture
     // transfer tokens public
@@ -86,34 +66,51 @@ contract BasicDutchAuction {
         balances[to] += amount;
     }
 
-    // not fully functioning but supposed to return list of bidder's address
+    // return list of bidder's address - not currently working
+    address payable[] public bidders;
+
     function getBidders() public view returns (address payable[] memory) {
         return bidders;
     }
 
+    // returns the current price of the item at block x
+    function getCurrentPrice() public view returns (uint256) {
+        return
+            initialPrice -
+            ((block.number - 1 - blockStart) * offerPriceDecrement);
+    }
+
     // allows users to submit a bid on the auction
     // bids can be submitted by an externally owned ETH wallet
-    function bid() public payable {
-        // returns (address) - add this after payable and before {}
-        // return address(0); // returns the address of the winner?
+    function bid() public payable returns (address) {
+        // check if there is a winner
+        require(
+            winner == address(0),
+            "You just missed out! There is already a winner for this item"
+        );
+        // check if the owner is submitting a bid on their own item
+        require(msg.sender != seller, "Owner cannot submit bid on own item");
+        // check if the numBlocksAuctionOpen has passed
+        require(
+            block.number - blockStart <= numBlocksAuctionOpen,
+            "Auction has closed - total number of blocks the auction is open for have passed"
+        );
+        // check if the buyer has sufficient funds
+        require(
+            msg.value >= getCurrentPrice(),
+            "You have not sent sufficient funds"
+        );
 
         // allows for tracking and listing of all addresses who have intereacted with this contract
-        bidders.push(payable(msg.sender));
+        // bidders.push(payable(msg.sender));
 
-        // everything here and down is chat gpt code
-        // require is used to verify inputs and conditions before execution
-        require(msg.value >= initialPrice); // msg.value contains the amount of wei sent in the tx
-        require(block.number - blockStart <= numBlocksAuctionOpen); // block x - starting block must be < = num of blocks auction is open for
+        //
+        // require(msg.sender);
 
-        // if the highest bidder isnt the seller, transfer the highest bid?
-        if (highestBidder != address(0)) {
-            highestBidder.transfer(highestBid);
-        }
+        // calls finalize function to
+        finalize();
 
-        highestBidder = payable(msg.sender); // highest bidder is the wallet most recently transacting with contract
-        highestBid = msg.value; // highest bid is the value
-        initialPrice -= offerPriceDecrement; // decrements the offer price
-        // end chat gpt code for this function
+        return winner;
     }
 
     // the first bid processed by the contract that sends wei greater or equal to the current price is the winner
@@ -121,19 +118,17 @@ contract BasicDutchAuction {
     // allows sellers to end the auction
     // function checks if the highest bid is higher
     function finalize() public {
-        // start chat gpt code
-        require((msg.sender == seller));
-        require(block.number - blockStart > numBlocksAuctionOpen);
-
-        if (highestBid >= reservePrice) {
-            seller.transfer(highestBid);
-        } else {
-            highestBidder.transfer(highestBid);
-        }
-        // end chat gpt code for this function
+        winner = payable(msg.sender);
     }
 
     // refunds the bids to all the wallets with losing bids
     // all bids besides the winner should be refunded immediately
-    function refund(uint256 refundAmount) public {}
+    function refund(uint256 refundAmount) public {
+        // get an array of the losing bids addresses and transfer their tokens back to them
+    }
+
+    // not working
+    function viewWinner() public {
+        bid();
+    }
 }
