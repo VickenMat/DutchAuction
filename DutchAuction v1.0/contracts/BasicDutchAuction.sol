@@ -19,16 +19,13 @@ contract BasicDutchAuction {
     uint256 immutable offerPriceDecrement;
     uint256 immutable initialPrice;
 
-    address public buyer;
-    address payable public immutable seller;
-    address payable public winner;
+    address payable immutable seller;
+    address payable winner;
 
     // maybe not needed
-    mapping(address => uint256) public balances; // public key
-
-    // variables below is from chat gpt
-    uint256 public highestBid;
-    uint256 public blockStart;
+    mapping(address => uint256) balances; // public key
+    uint256 blockStart;
+    uint256 totalBids = 0;
 
     // constructor which initializes 5 variables
     constructor(
@@ -57,17 +54,8 @@ contract BasicDutchAuction {
         blockStart = block.number;
     }
 
-    // professors lecture
-    // transfer tokens public
-    function transfer(address to, uint256 amount) public {
-        // deduct tokens from the sender
-        balances[msg.sender] -= amount;
-        // give deducted tokens to to account
-        balances[to] += amount;
-    }
-
     // return list of bidder's address - not currently working
-    address payable[] public bidders;
+    address payable[] bidders;
 
     function getBidders() public view returns (address payable[] memory) {
         return bidders;
@@ -101,34 +89,48 @@ contract BasicDutchAuction {
             "You have not sent sufficient funds"
         );
 
+        // increments totalBids by 1 every time a bid is done
+        totalBids++;
         // allows for tracking and listing of all addresses who have intereacted with this contract
-        // bidders.push(payable(msg.sender));
+        bidders.push(payable(msg.sender));
 
         //
         // require(msg.sender);
 
         // calls finalize function to
         finalize();
-
+        seller.transfer(msg.value);
         return winner;
     }
 
     // the first bid processed by the contract that sends wei greater or equal to the current price is the winner
     // the wei should be transferred immediately to the seller and the contract should not accept any more bids
     // allows sellers to end the auction
-    // function checks if the highest bid is higher
-    function finalize() public {
+    function finalize() public payable {
+        require(totalBids > 0, "There must be at least one bid to finalize");
         winner = payable(msg.sender);
     }
 
     // refunds the bids to all the wallets with losing bids
     // all bids besides the winner should be refunded immediately
+    // after auction is closed, if anyone submits a bid, they will see a message saying "auction closed" or whatever
+    // they will then call this function to get their wei back
     function refund(uint256 refundAmount) public {
         // get an array of the losing bids addresses and transfer their tokens back to them
     }
 
     // not working
-    function viewWinner() public {
-        bid();
+    function viewWinner() public view returns (address) {
+        return winner;
     }
+
+    // transfer tokens public
+    /*
+    function transfer(address to, uint256 amount) public {
+        // deduct tokens from the sender
+        balances[msg.sender] -= amount;
+        // give deducted tokens to to account
+        balances[to] += amount;
+    }
+    */
 }
