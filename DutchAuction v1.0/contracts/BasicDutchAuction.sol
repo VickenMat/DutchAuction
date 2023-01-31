@@ -27,23 +27,23 @@ contract BasicDutchAuction {
         uint256 _numBlocksAuctionOpen, // number of blockchain blocks that the auction is open for
         uint256 _offerPriceDecrement // amount of wei that the auction price should decrease by during each subsequent block
     ) {
+        reservePrice = _reservePrice;
+        numBlocksAuctionOpen = _numBlocksAuctionOpen;
+        offerPriceDecrement = _offerPriceDecrement;
         // sets the initial price to the equation below
         initialPrice =
             _reservePrice +
             _numBlocksAuctionOpen *
             _offerPriceDecrement;
-        reservePrice = _reservePrice;
-        numBlocksAuctionOpen = _numBlocksAuctionOpen;
-        offerPriceDecrement = _offerPriceDecrement;
         // assigning seller to the person who's currently connecting with the contract
         seller = payable(msg.sender);
-        // assigns the starting block as the current block
+        // assigns the current block as the starting block
         blockStart = block.number;
     }
 
-    address payable[] bidders;
+    address payable[] bidders; // creates an empty array of addresses
 
-    // returns a list of all bidder's addresses
+    // returns a list of all bidder addresses
     function getBidders() public view returns (address payable[] memory) {
         return bidders;
     }
