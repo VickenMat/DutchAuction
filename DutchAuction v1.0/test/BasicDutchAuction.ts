@@ -1,6 +1,6 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-import hre, { ethers } from 'hardhat'
+import hre, { artifacts, ethers } from 'hardhat'
 import { expect } from 'chai'
 import { Contract } from "ethers";
 import '@nomiclabs/hardhat-ethers'
@@ -8,7 +8,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 // npx hardhat test 
 import assert from 'assert';
-import { compiledContract } from '../scripts/compile';
+// import { compiledContract } from '../scripts/compile';
 import Web3 from 'web3';
 
 // local test network that is created when we start running our tests
@@ -24,9 +24,15 @@ const web3 = new Web3(provider);
 // const { abi, evm } = require('../scripts/compile');
 // let abi = require('../scripts/compile.ts');
 
+const auction1 = {
+  reservePrice: '100',
+  numBlocksAuctionOpen: '10',
+  offerPriceDecrement: '10'
+};
+
 let BasicDutchAuction: Contract;
-let owner: SignerWithAddress;
-let bidder: SignerWithAddress;
+// let owner: SignerWithAddress;
+// let bidder: SignerWithAddress;
 let accounts: string[];
 let auction: any;
 
@@ -35,29 +41,35 @@ beforeEach(async () => {
   // get list of all accounts
   accounts = await web3.eth.getAccounts();
   // use first account to deploy the contract
+  // auction = await new web3.eth.Contract(abi)
+  // auction = (await new web3.eth.Contract(abi)
+  //  .deploy({ data: '0x' + evm.bytecode.object, })
+  //  .send({
+  //    from: accounts[0], gas: 1000000,
+  //  }));
   
-  auction = (await new web3.eth.Contract(abi)
-    .deploy({ data: '0x' + evm.bytecode.object, })
-    .send({
-      from: accounts[0], gas: 1000000,
-    }));
-  
-  const DutchAuctionFactory = await ethers.getContractFactory('Dutch Auction');
-
-  BasicDutchAuction = await DutchAuctionFactory.deploy(
-    '100',
-    '10',
-    '10'
-  );
-
+  // const DutchAuctionFactory = 
+  // await ethers.getContractFactory('Dutch Auction');
 });
 
 // deploying contract
+/*
+const run = require('../contracts/BasicDutchAuction.sol');
 describe('Dutch Auction Contract', () => {
-  it('deploys a contract', () => {
-    assert.ok(auction.options.address);
+  it('creates a dutch auction', function (done) {
+    run(accounts, done, {
+      type: "dutch",
+      reservePrice: 100,
+      judgeAddress: 0x0000000000000000000000000000000000000000,
+      biddingTimePeriod: 10,
+      offerPriceDecrement: 10,
+      actions: [],
+    });
   });
 });
+*/
+
+
 
 // setting up the parameters of the contract
 describe("Setting up auction", function () {
@@ -115,9 +127,14 @@ describe("testing functions", function () {
 
   });
 
+});
 
 
-    /*
+
+
+
+
+/*
     it('we should transfer the amount', async function(){
       const{ token, owner, otherAccount } = await loadFixture(deployBasicDutchAuctionFixture);
       await token.transfer(otherAccount.address, 1000);
@@ -126,10 +143,16 @@ describe("testing functions", function () {
       // checking to see if the owner has 1000 tokens after receiving 1000
       expect(await token.balances(otherAccount.address)).to.equal(1000);
     });
-    */
+    
   });
 
-  /*
+
+
+
+
+
+
+  
 
 // when called, it will increase the EVM internal timestamp 10 seconds ahead of the current time
 // after that, if you specify it, it will also mine a block to create a tx
@@ -157,6 +180,6 @@ describe("Basic Dutch Auction", function () {
     const token = await tokenFactory.deploy(5000, 10, 500);
 
     return { token, owner, otherAccount };
-  
-}
+  };
+});
 */
