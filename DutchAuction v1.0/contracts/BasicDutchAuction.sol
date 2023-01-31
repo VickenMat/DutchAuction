@@ -16,9 +16,11 @@ contract BasicDutchAuction {
     address payable immutable seller;
     address payable winner;
 
-    mapping(address => uint256) balances; // public key
     uint256 blockStart;
     uint256 totalBids = 0;
+    uint256 refundAmount;
+    bool isAuctionOpen = true; // unused for now
+    mapping(address => uint256) balances; // unused for now
 
     constructor(
         uint256 _reservePrice, // minimum amount of wei that the seller is willing to accept for the item
@@ -33,11 +35,6 @@ contract BasicDutchAuction {
         reservePrice = _reservePrice;
         numBlocksAuctionOpen = _numBlocksAuctionOpen;
         offerPriceDecrement = _offerPriceDecrement;
-        // check that the starting price is greater than the num of blocks * price decrement
-        require(
-            _reservePrice >= _numBlocksAuctionOpen * _offerPriceDecrement,
-            "Reserve price must be greater than initial price"
-        );
         // assigning seller to the person who's currently connecting with the contract
         seller = payable(msg.sender);
         // assigns the starting block as the current block
@@ -78,36 +75,38 @@ contract BasicDutchAuction {
             msg.value >= getCurrentPrice(),
             "You have not sent sufficient funds"
         );
-        // increments totalBids by 1 every time a bid is entered
-        totalBids++;
-        // allows contract to append the bidders array by adding all addresses that have submitted a successful bid
-        bidders.push(payable(msg.sender));
 
-        // call finalize fn to --
-        // finalize();
+        totalBids++; // increments totalBids by 1 every time a bid is entered
 
-        seller.transfer(msg.value); // transfers money from bidder to seller
-        winner = payable(msg.sender); // assigns winner to the person who placed the first winning bid
+        bidders.push(payable(msg.sender)); // allows contract to append the bidders array with all successful bidder addresses
+
+        uint256 price = getCurrentPrice(); // gets the price from the getCurrentPrice fn
+
+        finalize(); // assigns winner to the person who placed the first winning bid
+
+        refundAmount = msg.value - price; // calculates refund amount
+
+        refund(refundAmount); // calls refund functions and has a parameter of how much to refund
+
+        seller.transfer(msg.value - refundAmount); // transfers money from bidder to seller
         return winner;
     }
 
-    // the first bid processed by the contract that sends wei greater or equal to the current price is the winner
-    // the wei should be transferred immediately to the seller and the contract should not accept any more bids
-    // allows sellers to end the auction
+    // assigns the winning address to winner variable
     function finalize() public {
         require(totalBids > 0, "There must be at least one bid to finalize");
+        winner = payable(msg.sender);
     }
 
     // refunds the bids to all the wallets with losing bids
-    // all bids besides the winner should be refunded immediately
-    // after auction is closed, if anyone submits a bid, they will see a message saying "auction closed" or whatever
-    // they will then call this function to get their wei back
-    function refund(uint256 refundAmount) public payable {
+    function refund(uint256 _refundAmount) public payable {
         // get an array of the losing bids addresses and transfer their tokens back to them
         require(seller != winner, "Seller cannot refund themselves");
         require(address(0) != winner, "You won the auction! Nothing to refund");
-        // balances[]
-        seller.transfer(refundAmount);
+        // checks if the refund amount is greater than 0
+        if (_refundAmount > 0) {
+            payable(msg.sender).transfer(_refundAmount);
+        }
     }
 
     // returns the address of the winning bid
