@@ -51,8 +51,7 @@ contract BasicDutchAuction {
     // returns the current price of the item
     function getCurrentPrice() public view returns (uint256) {
         return
-            initialPrice -
-            ((block.number - 1 - blockStart) * offerPriceDecrement);
+            initialPrice - ((block.number - blockStart) * offerPriceDecrement);
     }
 
     // bid function makes checks, submits bids, and executes the wei transfer if accepted
