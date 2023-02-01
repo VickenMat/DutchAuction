@@ -15,17 +15,29 @@ describe("Test Cases", function () {
       const { basicDutchAuctionToken, owner } = await loadFixture(deployOneYearLockFixture);
       expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
     });
-    
-    it('seller - owner of the contract', async function(){
-  
+
+    it('is seller owner of this contract', async function(){
+      const { basicDutchAuctionToken, owner } = await loadFixture(deployOneYearLockFixture);
+      expect(await basicDutchAuctionToken.connect(owner).bid({from: owner.address, value: 200}
+        ));
+    });
+
+    it('bidder - successful bid', async function(){
+      const { basicDutchAuctionToken, otherAccount } = await loadFixture(deployOneYearLockFixture);
+      expect(await basicDutchAuctionToken.connect(otherAccount).bid({from: otherAccount.address, value: 200}
+        ));
     });
   
     it('seller - bidding on own item', async function(){
-  
+      const { basicDutchAuctionToken, owner } = await loadFixture(deployOneYearLockFixture);
+      expect(await basicDutchAuctionToken.connect(owner).bid({from: owner.address, value: 200}
+        ));
     });
   
     it('auction ended - winner already chosen', async function(){
-  
+      const { basicDutchAuctionToken, otherAccount } = await loadFixture(deployOneYearLockFixture);
+      expect(await basicDutchAuctionToken.connect(otherAccount).bid({from: otherAccount.address, value: 220}
+        ));
     });
   
     it('auction ended - reject bid because select number of blocks passed', async function(){
@@ -41,7 +53,9 @@ describe("Test Cases", function () {
     });
   
     it('multiple bids - first greater than current price, second lower', async function(){
-  
+      const { basicDutchAuctionToken, otherAccount } = await loadFixture(deployOneYearLockFixture);
+      expect(await basicDutchAuctionToken.connect(otherAccount).bid({from: otherAccount.address, value: 200}
+        ));
     });
   
     it('multiple bids - both higher than current price', async function(){
