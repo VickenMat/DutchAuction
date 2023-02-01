@@ -54,6 +54,21 @@ contract BasicDutchAuction {
             initialPrice - ((block.number - blockStart) * offerPriceDecrement);
     }
 
+    // returns the reserve price
+    function getReservePrice() public view returns (uint256) {
+        return reservePrice;
+    }
+
+    // returns the number of blocks open auction is open for
+    function getNumBlocksAuctionOpen() public view returns (uint256) {
+        return numBlocksAuctionOpen;
+    }
+
+    // returns the price decrement
+    function getPriceDecrement() public view returns (uint256) {
+        return offerPriceDecrement;
+    }
+
     // bid function makes checks, submits bids, and executes the wei transfer if accepted
     function bid() public payable returns (address) {
         // check if there is a winner
@@ -109,7 +124,12 @@ contract BasicDutchAuction {
     }
 
     // returns the address of the winning bid
-    function viewWinner() public view returns (address) {
+    function getWinner() public view returns (address) {
         return winner;
+    }
+
+    // returns the sellers address
+    function getSellerAddress() public view returns (address) {
+        return seller;
     }
 }
