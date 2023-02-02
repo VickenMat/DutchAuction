@@ -71,6 +71,7 @@ contract BasicDutchAuction {
 
     // bid function makes checks, submits bids, and executes the wei transfer if accepted
     function bid() public payable returns (address) {
+        require(isAuctionOpen == true, "Auction is open");
         // check if there is a winner
         require(
             // displays message if the winner is not the first address
@@ -103,6 +104,7 @@ contract BasicDutchAuction {
         refund(refundAmount); // calls refund functions and has a parameter of how much to refund
 
         seller.transfer(msg.value - refundAmount); // transfers money from bidder to seller
+        isAuctionOpen = false;
         return winner;
     }
 
@@ -125,6 +127,7 @@ contract BasicDutchAuction {
 
     // returns the address of the winning bid
     function getWinner() public view returns (address) {
+        require(winner == msg.sender, "You are the winner");
         return winner;
     }
 
