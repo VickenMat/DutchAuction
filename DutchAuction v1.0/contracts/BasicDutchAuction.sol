@@ -132,4 +132,8 @@ contract BasicDutchAuction {
     function getSellerAddress() public view returns (address) {
         return seller;
     }
+
+    function balanceOf(address) public view returns (uint256) {
+        return address(this).balance;
+    }
 }
