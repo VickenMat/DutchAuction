@@ -6,6 +6,7 @@ import { assert } from "console";
 
 
 describe("Deployment", function () {
+
   async function deployDutchAuction() {
     // signers are objects that represent an ethereum account
     const [owner, account1, account2] = await ethers.getSigners();
@@ -20,7 +21,7 @@ describe("Deployment", function () {
     const accountOneBalance = await basicDutchAuctionToken.balanceOf(account1.address);
     const accountTwoBalance = await basicDutchAuctionToken.balanceOf(account2.address);
     return { basicDutchAuctionToken, owner, account1, account2 };
-  //}
+  }
   it('reserve price - 200 wei' , async function(){
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
     expect(await basicDutchAuctionToken.getReservePrice()).to.equal(100);
@@ -35,7 +36,7 @@ describe("Deployment", function () {
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
     expect(await basicDutchAuctionToken.getPriceDecrement()).to.equal(10);
   });
-}
+
 
 
 
@@ -94,14 +95,20 @@ describe("Test Cases", function () {
   
     });
   
-    it('multiple bids - first greater than current price, second lower', async function(){
+    it('multiple bids - first bid greater than current price, second bid lower', async function(){
       const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-      expect(await basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200}
+      expect(await basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 220}
+        ));
+      expect(await basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 180}
         ));
     });
   
-    it('multiple bids - both higher than current price', async function(){
-  
+    it('multiple bids - both bids higher than current price', async function(){
+      const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
+      expect(await basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 300}
+        ));
+      expect(await basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 280}
+        ));
     });
   
     it('seller balance - increases', async function(){
@@ -113,7 +120,9 @@ describe("Test Cases", function () {
     });
   
     it('refund losing bids', async function(){
-  
+      const { basicDutchAuctionToken, account2 } = await loadFixture(deployDutchAuction);
+      expect(await basicDutchAuctionToken.connect(account2).refund(10
+        ));
     });
   
   });
