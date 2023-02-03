@@ -4,9 +4,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { assert } from "console";
 
-
 describe("Deploying Contract", function () {
-
   async function deployDutchAuction() {
     // signers are objects that represent an ethereum account
     const [owner, account1, account2] = await ethers.getSigners();
@@ -43,94 +41,89 @@ describe("Deploying Contract", function () {
     expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
   });
   describe("Checking Seller", function () {
-    
-    // needs work
     it('is owner of this contract the seller', async function(){
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-      expect( await basicDutchAuctionToken.getSellerAddress());
+      expect( await basicDutchAuctionToken.getSellerAddress()).to.equal(owner.address);
     });
 
-    it('seller - bidding on own item', async function(){
-      const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-      expect( basicDutchAuctionToken.connect(owner).bid({from: owner.address, value: 200}
-        ));
-    });
-    it('bid from owner account', async function(){
+    it('bid from seller account', async function(){
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
       expect( basicDutchAuctionToken.connect(owner).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
-        
     });
-
-    describe('Checking Bidders', function () {
-      it('checks if bidder has more than 0 wei', async function(){
-        const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-        expect( basicDutchAuctionToken.balanceOf(account1.address));
-      });
-    
-      it('bid accepted - sufficient amount', async function(){
-    
-      });
-    
-      it('bid rejected - insufficient amount', async function(){
-    
-      });
+    // npx hardhat node lists addresses and balances
+      describe('Checking Bidders', function () {
+        /*
+        it('checks if bidder has more than 0 wei', async function(){
+          const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
+          expect( await basicDutchAuctionToken.balanceOf(account1.address)).to.greaterThan(ethers.utils.parseUnits("0", 1)).to.be.revertedWith("Your accounts balance is not greater than 0");
+        });
+        */
+      /*
+        it('bid accepted - sufficient amount', async function(){
+          const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account1).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
+        });
+      */
+        it('bid rejected - insufficient amount', async function(){
+          const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(owner).bid({value: 100})).to.be.revertedWith("You have not sent sufficient funds");
+        });
   
-      it('bidding 200 wei - successful bid', async function(){
-        const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-        expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200}
+        it('bidding 200 wei - successful bid', async function(){
+          const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200}
           ));
-      });
+        });
 
-      it('multiple bids - first bid greater than current price, second bid lower', async function(){
-        const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-        expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 220}
-          ));
+        it('multiple bids - first bid greater than current price, second bid lower', async function(){
+          const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 220}
+        ));
         expect( basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 180}
           ));
-      });
+        });
     
-      it('multiple bids - both bids higher than current price', async function(){
-        const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-        expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 300}
-          ));
-        expect( basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 280}
-          ));
-      });
+        it('multiple bids - both bids higher than current price', async function(){
+          const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 300}
+            ));
+          expect( basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 280}
+            ));
+        });
 
-      it('check for winner', async function(){
-        const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-        expect( basicDutchAuctionToken.getWinner());
-      });
+        it('check for winner', async function(){
+          const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.getWinner());
+        });
 
-      it('auction ended - winner already chosen', async function(){
-        const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-        const winner = account1;
-        // expect(basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200},
-        // ))
+        it('auction ended - winner already chosen', async function(){
+          const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
+          const winner = account1;
+          // expect(basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200},
+          // ))
   
-        expect(basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 220}
-        ));
-      });
-
-      it('auction ended - reject bid because select number of blocks passed', async function(){
-      
-      });
-
-
-      it('refund losing bids', async function(){
-        const { basicDutchAuctionToken, account2 } = await loadFixture(deployDutchAuction);
-        expect( basicDutchAuctionToken.connect(account2).refund(10
+          expect(basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 220}
           ));
-      });
+        });
 
-      it('seller balance - increases', async function(){
+        it('auction ended - reject bid because select number of blocks passed', async function(){
+          const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200})).to.be.revertedWith("Auction has closed - total number of blocks the auction is open for have passed");
+        });
+
+        it('refund losing bids', async function(){
+          const { basicDutchAuctionToken, account2 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account2).refund(10
+            ));
+        });
+
+        it('seller balance - increases', async function(){
   
-      });
+        });
     
-      it('buyer balance - decreases', async function(){
+        it('buyer balance - decreases', async function(){
     
-      });
-
+        });
     });
   });
 });

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 
-// This program creates a contract to manage the auction of a single, physical item at a single auction event
-
 // npx hardhat compile
-// REPORT_GAS=true npx hardhat test
+// npx hardhat test     REPORT_GAS=true - in front of npx if desired
+// npx hardhat coverage
+
+// This program creates a contract to manage the auction of a single, physical item at a single auction event
 
 pragma solidity ^0.8.17;
 
@@ -14,12 +15,12 @@ contract BasicDutchAuction {
     uint256 immutable initialPrice;
 
     address payable immutable seller;
-    address payable winner;
+    address payable public winner;
 
     uint256 blockStart;
     uint256 totalBids = 0;
     uint256 refundAmount;
-    bool isAuctionOpen = true; // unused for now
+    bool isAuctionOpen = true;
     mapping(address => uint256) balances; // unused for now
 
     constructor(
@@ -41,17 +42,9 @@ contract BasicDutchAuction {
         blockStart = block.number;
     }
 
-    address payable[] bidders; // creates an empty array of addresses
-
-    // returns a list of all bidder addresses
-    function getBidders() public view returns (address payable[] memory) {
-        return bidders;
-    }
-
     // returns the current price of the item
     function getCurrentPrice() public view returns (uint256) {
-        return
-            initialPrice - ((block.number - blockStart) * offerPriceDecrement);
+        return initialPrice - (block.number - blockStart) * offerPriceDecrement;
     }
 
     // returns the reserve price
@@ -69,65 +62,62 @@ contract BasicDutchAuction {
         return offerPriceDecrement;
     }
 
-    // bid function makes checks, submits bids, and executes the wei transfer if accepted
+    // bid function makes checks, accepts or rejects bids, and executes the wei transfer if accepted
     function bid() public payable returns (address) {
-        require(isAuctionOpen == true, "Auction is open");
-        // check if there is a winner
+        require(isAuctionOpen == true, "Auction is open"); // checks to make sure the auction is still open
         require(
-            // displays message if the winner is not the first address
             winner == address(0),
-            "You just missed out! There is already a winner for this item"
+            "You just missed out! There is already a winner for this item" // check if there is a winner
         );
-        // check if the owner is submitting a bid on their own item
-        require(msg.sender != seller, "Owner cannot submit bid on own item");
-        // check if the duration of the auction has passed by seeing what block we're on
+        require(msg.sender != seller, "Owner cannot submit bid on own item"); // check if the owner bids on own item
         require(
             block.number - blockStart <= numBlocksAuctionOpen,
-            "Auction has closed - total number of blocks the auction is open for have passed"
+            "Auction has closed - total number of blocks the auction is open for have passed" // check if the duration of the auction has passed by seeing what block we're on
         );
-        // check if the buyer has bid a sufficient amount
+        require(
+            address(this).balance > 0,
+            "Your accounts balance is not greater than 0" // checks if the bidding address's balance is greater than 0
+        );
         require(
             msg.value >= getCurrentPrice(),
-            "You have not sent sufficient funds"
+            "You have not sent sufficient funds" // check if the buyer has bid a sufficient amount
         );
 
         totalBids++; // increments totalBids by 1 every time a bid is entered
 
-        bidders.push(payable(msg.sender)); // allows contract to append the bidders array with all successful bidder addresses
+        // bidders.push(payable(msg.sender)); // allows contract to append the bidders array with all successful bidder addresses
 
-        uint256 price = getCurrentPrice(); // gets the price from the getCurrentPrice fn
+        uint256 price = getCurrentPrice(); // gets updated price
 
         finalize(); // assigns winner to the person who placed the first winning bid
 
         refundAmount = msg.value - price; // calculates refund amount
-
         refund(refundAmount); // calls refund functions and has a parameter of how much to refund
 
-        seller.transfer(msg.value - refundAmount); // transfers money from bidder to seller
-        isAuctionOpen = false;
+        seller.transfer(msg.value - refundAmount); // transfers wei from bidder to seller
+        isAuctionOpen = false; // sets isAuctionOpen variable to false
         return winner;
     }
 
     // assigns the winning address to winner variable
     function finalize() public {
-        require(totalBids > 0, "There must be at least one bid to finalize");
-        winner = payable(msg.sender);
+        require(totalBids > 0, "There must be at least one bid to finalize"); // checks if there is at least one bid on item
+        winner = payable(msg.sender); // assigns winner variable to winning address
     }
 
     // refunds the bids to all the wallets with losing bids
     function refund(uint256 _refundAmount) public payable {
-        // get an array of the losing bids addresses and transfer their tokens back to them
-        require(seller != winner, "Seller cannot refund themselves");
-        require(address(0) != winner, "You won the auction! Nothing to refund");
-        // checks if the refund amount is greater than 0
+        require(seller != winner, "Seller cannot refund themselves"); // checks if the seller is trying to refund themselves
+        require(address(0) != winner, "You won the auction! Nothing to refund"); // checks if the winner is trying to get a refund
         if (_refundAmount > 0) {
-            payable(msg.sender).transfer(_refundAmount);
+            // checks if the refund amount is greater than 0
+            payable(msg.sender).transfer(_refundAmount); // refunds address
         }
     }
 
     // returns the address of the winning bid
     function getWinner() public view returns (address) {
-        require(winner == msg.sender, "You are the winner");
+        require(winner == msg.sender, "You are the winner"); // checks if the winner variable is the winning address
         return winner;
     }
 
@@ -136,7 +126,17 @@ contract BasicDutchAuction {
         return seller;
     }
 
+    // returns balance of requested address
     function balanceOf(address) public view returns (uint256) {
         return address(this).balance;
     }
+
+    /*
+    address payable[] bidders; // creates an empty array of addresses
+
+    // returns a list of all bidder addresses
+    function getBidders() public view returns (address payable[] memory) {
+        return bidders;
+    }
+    */
 }
