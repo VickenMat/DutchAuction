@@ -40,6 +40,7 @@ describe("Deploying Contract", function () {
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
     expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
   });
+
   describe("Checking Seller", function () {
     it('is owner of this contract the seller', async function(){
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
@@ -50,7 +51,6 @@ describe("Deploying Contract", function () {
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
       expect( basicDutchAuctionToken.connect(owner).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
     });
-    // npx hardhat node lists addresses and balances
       describe('Checking Bidders', function () {
         /*
         it('checks if bidder has more than 0 wei', async function(){
@@ -58,21 +58,15 @@ describe("Deploying Contract", function () {
           expect( await basicDutchAuctionToken.balanceOf(account1.address)).to.greaterThan(ethers.utils.parseUnits("0", 1)).to.be.revertedWith("Your accounts balance is not greater than 0");
         });
         */
-      /*
-        it('bid accepted - sufficient amount', async function(){
+      
+        it('bid accepted - 200 wei - sufficient amount', async function(){
           const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account1).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
+          expect( basicDutchAuctionToken.connect(account1).bid({value: 200}));
         });
-      */
-        it('bid rejected - insufficient amount', async function(){
+      
+        it('bid rejected - 100 wei - insufficient amount', async function(){
           const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(owner).bid({value: 100})).to.be.revertedWith("You have not sent sufficient funds");
-        });
-  
-        it('bidding 200 wei - successful bid', async function(){
-          const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200}
-          ));
+          expect( basicDutchAuctionToken.connect(owner).bid({value: 100})).to.be.revertedWith("You have not bid sufficient funds");
         });
 
         it('multiple bids - first bid greater than current price, second bid lower', async function(){
@@ -93,15 +87,12 @@ describe("Deploying Contract", function () {
 
         it('check for winner', async function(){
           const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.getWinner());
+          expect( basicDutchAuctionToken.getWinner()).to.be.revertedWith('You are the winner');
         });
 
         it('auction ended - winner already chosen', async function(){
           const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
           const winner = account1;
-          // expect(basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200},
-          // ))
-  
           expect(basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 220}
           ));
         });
@@ -115,14 +106,6 @@ describe("Deploying Contract", function () {
           const { basicDutchAuctionToken, account2 } = await loadFixture(deployDutchAuction);
           expect( basicDutchAuctionToken.connect(account2).refund(10
             ));
-        });
-
-        it('seller balance - increases', async function(){
-  
-        });
-    
-        it('buyer balance - decreases', async function(){
-    
         });
     });
   });
