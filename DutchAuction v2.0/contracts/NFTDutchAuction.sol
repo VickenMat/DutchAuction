@@ -3,6 +3,7 @@
 pragma solidity ^0.8.17;
 // import openzeppelin contract by writing "import @openzeppelin/contracts"...
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./MintNFT.sol";
 
 contract NFTDutchAuction is ERC721 {
     // uint private constant DURATION = 1 days;
