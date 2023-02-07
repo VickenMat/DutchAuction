@@ -5,12 +5,20 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./MintNFT.sol";
 
-contract TestAuction is Initializable {
+interface IERC721 {
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _nftId
+    ) external;
+}
+
+contract Test is Initializable {
     uint256 reservePrice;
     uint256 numBlocksAuctionOpen;
     uint256 offerPriceDecrement;
     uint256 initialPrice;
-    address erc721TokenAddress;
+    IERC721 public erc721TokenAddress;
     uint256 nftTokenID;
 
     address payable seller;
@@ -42,7 +50,7 @@ contract TestAuction is Initializable {
         // assigns the current block as the starting block
         blockStart = block.number;
         // initializes token address and id
-        erc721TokenAddress = _erc721TokenAddress;
+        erc721TokenAddress = IERC721(_erc721TokenAddress);
         nftTokenID = _nftTokenID;
     }
 
@@ -78,6 +86,9 @@ contract TestAuction is Initializable {
         winner = payable(msg.sender); // assigns winner to address with first winning bid - finalize fn
 
         seller.transfer(msg.value); // transfers wei from bidder to seller
+
+        erc721TokenAddress.transferFrom(seller, msg.sender, nftTokenID);
+
         isAuctionOpen = false; // sets isAuctionOpen variable to false
         return winner;
     }

@@ -17,14 +17,14 @@ contract MintNFT is
 
     CountersUpgradeable.Counter private _tokenIdCounter;
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-
+    // initialize instead of constructor allows function to be upgradeable
     function initialize() public initializer {
         __ERC721_init("Vickens NFT", "VNFT");
         __ERC721URIStorage_init();
         __Ownable_init();
     }
 
+    // this is the function that mints the nft to the given address
     function safeMint(address to, string memory uri) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
