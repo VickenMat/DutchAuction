@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.17;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./MintNFT.sol";
 
 interface IMintNFT {
     function safeTransferFrom(
@@ -23,15 +25,15 @@ contract NFTDutchAuction is Initializable {
     address erc721TokenAddress;
     uint256 public nftTokenID;
 
-    address payable seller;
-    address public winner = address(0x0);
+    address seller;
+    address winner;
 
     uint256 blockStart;
     uint256 totalBids = 0;
     uint256 refundAmount;
     bool isAuctionOpen = true;
 
-    IMintNFT mint;
+    IMintNFT private mintNFT;
 
     function initialize(
         address _erc721TokenAddress,
@@ -49,12 +51,15 @@ contract NFTDutchAuction is Initializable {
             _numBlocksAuctionOpen *
             _offerPriceDecrement;
         // assigning seller to the person who's currently connecting with the contract
-        seller = payable(msg.sender);
+        seller = msg.sender;
         // assigns the current block as the starting block
         blockStart = block.number;
         erc721TokenAddress = _erc721TokenAddress;
         nftTokenID = _nftTokenID;
-        mint = IMintNFT(erc721TokenAddress);
+    }
+
+    function setMintID(IMintNFT _mintNFT) public {
+        mintNFT = _mintNFT;
     }
 
     function getCurrentPrice() public view returns (uint256) {
@@ -87,11 +92,9 @@ contract NFTDutchAuction is Initializable {
 
         require(totalBids > 0, "There must be at least one bid to finalize"); // checks if there is at least one bid on item
 
-        winner = payable(msg.sender); // assigns winner to address with first winning bid - finalize fn
-
-        seller.transfer(msg.value); // transfers wei from bidder to seller
-
-        mint.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
+        winner = msg.sender; // assigns winner to address with first winning bid - finalize fn
+        payable(seller).transfer(msg.value); // transfers wei from bidder to seller
+        mintNFT.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
 
         isAuctionOpen = false; // sets isAuctionOpen variable to false
         return winner;
