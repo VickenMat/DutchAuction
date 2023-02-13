@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-// npm install @openzeppelin/contracts-upgradeable
+
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -17,22 +17,24 @@ contract MintNFT is
 
     CountersUpgradeable.Counter private _tokenIdCounter;
 
-    // initialize instead of constructor allows function to be upgradeable
-    function initialize() public initializer {
+    uint256 public maxSupply;
+
+    function initialize(uint256 _maxSupply) public initializer {
+        maxSupply = _maxSupply;
         __ERC721_init("Vickens NFT", "VNFT");
         __ERC721URIStorage_init();
         __Ownable_init();
     }
 
-    // this is the function that mints the nft to the given address
     function safeMint(address to, string memory uri) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
+        require(tokenId <= (maxSupply - 1), "Max tokens reached");
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
     }
 
-    // The following functions are overrides required by Solidity.
+    // The following functions are overrides required by Solidity
 
     function _burn(uint256 tokenId)
         internal
