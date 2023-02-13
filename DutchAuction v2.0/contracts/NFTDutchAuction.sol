@@ -52,7 +52,6 @@ contract NFTDutchAuction is Initializable {
         seller = payable(msg.sender);
         // assigns the current block as the starting block
         blockStart = block.number;
-        // initializes token address and id
         erc721TokenAddress = _erc721TokenAddress;
         nftTokenID = _nftTokenID;
         mint = IMintNFT(erc721TokenAddress);
@@ -92,7 +91,7 @@ contract NFTDutchAuction is Initializable {
 
         seller.transfer(msg.value); // transfers wei from bidder to seller
 
-        mint.safeTransferFrom(seller, winner, nftTokenID);
+        mint.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
 
         isAuctionOpen = false; // sets isAuctionOpen variable to false
         return winner;
