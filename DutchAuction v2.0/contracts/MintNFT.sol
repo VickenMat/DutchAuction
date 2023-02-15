@@ -19,19 +19,26 @@ contract MintNFT is
 
     uint256 public maxSupply;
 
+    // fn to initialize the nft to the parameters set below
     function initialize(uint256 _maxSupply) public initializer {
         maxSupply = _maxSupply;
-        __ERC721_init("Vickens NFT", "VNFT");
+        require(maxSupply >= 1, "Max token supply must be greater than 0"); // throws error if max supply is set to 0
+        require(
+            maxSupply <= 500,
+            "Max token supply must be less than or equal to 500"
+        ); // throws error if max supply is set to a number greater than 500
+        __ERC721_init("Vickens NFT", "VNFT"); // initializes name and symbol
         __ERC721URIStorage_init();
         __Ownable_init();
     }
 
+    // mints the nft
     function safeMint(address to, string memory uri) public {
-        uint256 tokenId = _tokenIdCounter.current();
-        require(tokenId <= (maxSupply - 1), "Max tokens reached");
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
+        uint256 tokenId = _tokenIdCounter.current(); // sets tokenId to the current number in the counter
+        require(tokenId <= (maxSupply - 1), "Max number of tokens minted"); // checks if the number of minted nfts have surpassed the max supply we set earlier
+        _tokenIdCounter.increment(); // increments token counter for every successful nft mint
+        _safeMint(to, tokenId); // mints token to owners address and sets it to specific tokenId
+        _setTokenURI(tokenId, uri); // links tokenId with uri
     }
 
     // The following functions are overrides required by Solidity

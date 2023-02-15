@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./MintNFT.sol";
 
+// creates interface which allows us to uses openzeppelin functions
 interface IMintNFT {
     function safeTransferFrom(
         address _from,
@@ -14,7 +15,9 @@ interface IMintNFT {
         uint256 _nftId
     ) external;
 
-    function ownerOf(uint256 tokenId) external view returns (address);
+    function ownerOf(uint256 _tokenId) external view returns (address);
+
+    function balanceOf(address _owner) external view returns (uint256);
 }
 
 contract NFTDutchAuction is Initializable {
@@ -26,14 +29,14 @@ contract NFTDutchAuction is Initializable {
     uint256 public nftTokenID;
 
     address seller;
-    address winner;
+    address public winner;
 
     uint256 blockStart;
     uint256 totalBids = 0;
     uint256 refundAmount;
-    bool isAuctionOpen = true;
+    bool public isAuctionOpen = true;
 
-    IMintNFT private mintNFT;
+    IMintNFT private mintNFT; // initializes interface to mintNFT
 
     function initialize(
         address _erc721TokenAddress,
@@ -58,7 +61,8 @@ contract NFTDutchAuction is Initializable {
         nftTokenID = _nftTokenID;
     }
 
-    function setMintID(IMintNFT _mintNFT) public {
+    // takes nft minting contracts address as parameter
+    function setMintContractAddress(IMintNFT _mintNFT) public {
         mintNFT = _mintNFT;
     }
 
@@ -86,7 +90,7 @@ contract NFTDutchAuction is Initializable {
             msg.value >= getCurrentPrice(),
             "You have not sent sufficient funds"
         ); // check if the buyer has bid a sufficient amount
-        require(nftTokenID >= 0, "The NFT ID is less than 0");
+        require(nftTokenID >= 0, "The NFT token ID is less than 0"); // checks if the nft id is negative
 
         totalBids++; // increments totalBids by 1 every time a bid is entered
 
