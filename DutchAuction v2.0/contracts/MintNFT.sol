@@ -50,7 +50,7 @@ contract MintNFT is
         __ERC721URIStorage_init();
         __Ownable_init();
     }
-*/
+    */
 
     // The following functions are overrides required by Solidity
 

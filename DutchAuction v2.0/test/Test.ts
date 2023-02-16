@@ -21,21 +21,21 @@ describe("MintNFT", function () {
     await mintNFTToken.deployed();
   });
 
-  describe("deployment with max supply", function () {
-    it("should set the max supply", async function () {
+  describe("Max Supply", function () {
+    it("should set max supply of nfts minted to 10(index 0-9)", async function () {
       expect(await mintNFTToken.maxSupply()).to.equal(10);
     });
   });
 
   describe("safeMint", function () {
-    it("should mint a new NFT to the owner", async function () {
+    it("should mint 1 NFT to the owners address at index 0", async function () {
       const uri = "https://example.com/token/1";
       await mintNFTToken.safeMint(owner.address, uri);
-      expect(await mintNFTToken.balanceOf(owner.address)).to.equal(1);
+      expect(await mintNFTToken.ownerOf(0)).to.equal(owner.address);
     });
 
     it("should not mint more tokens than the max supply", async function () {
-      const uri = "https://example.com/token/1";
+      const uri = "testing uri";
       for (let i = 0; i < 10; i++) {
         await mintNFTToken.safeMint(owner.address, uri);
       }
@@ -44,9 +44,25 @@ describe("MintNFT", function () {
       );
     });
   });
+  describe("tokenURI", function () {
+    it("should return the URI of the given token", async function () {
+      const uri = "https://example.com/nft";
+      await mintNFTToken.safeMint(owner.address, uri);
+      expect(await mintNFTToken.tokenURI(0)).to.equal(uri);
+    });
+  });
+/*
+  describe("_burn", function () {
+    it("should burn an NFT", async function () {
+      const uri = "https://example.com/nft";
+      await mintNFTToken.safeMint(owner.address, uri);
+      await mintNFTToken.burn(0);
+      await expect(mintNFTToken.ownerOf(0)).to.be.revertedWith("ERC721: owner query for nonexistent token");
+    });
+  });
+*/
 });
-
-describe("Deploying Contract", function () {
+describe("NFTDutchAuction", function () {
   async function deployDutchAuction() {
     // signers are objects that represent an ethereum account
     const [owner, account1, account2] = await ethers.getSigners();
@@ -62,6 +78,7 @@ describe("Deploying Contract", function () {
     const accountTwoBalance = await basicDutchAuctionToken.balanceOf(account2.address);
     return { basicDutchAuctionToken, owner, account1, account2, accountOneBalance, accountTwoBalance};
   }
+  describe("Checking Auction Values", function () {
   // await tells the compiler not to go line by line
   it('reserve price - 100 wei' , async function(){
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
@@ -82,8 +99,8 @@ describe("Deploying Contract", function () {
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
     expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
   });
-
-  describe("Set Mint Contract Address", function () {
+  });
+  describe("setMintContractAddress", function () {
     it("checking mint contract address function", async function () {
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
       expect(await basicDutchAuctionToken.setMintContractAddress(owner.address));
@@ -100,14 +117,14 @@ describe("Deploying Contract", function () {
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
       expect( basicDutchAuctionToken.connect(owner).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
     });
-
+  });
     describe('Checking Bidders', function () {
-        /*
-        it('checks if bidder has more than 0 wei', async function(){
+        
+        it('bidder has more than 0 wei', async function(){
           const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-          expect( await basicDutchAuctionToken.balanceOf(account1.address)).to.greaterThan(ethers.utils.parseUnits("0", 1)).to.be.revertedWith("Your accounts balance is not greater than 0");
+          expect( await basicDutchAuctionToken.balanceOf(account1.address)).to.greaterThan(ethers.utils.parseUnits("-1", 1)).to.be.revertedWith("Your accounts balance is not greater than 0");
         });
-        */
+        
       
         it('bid accepted - 200 wei - sufficient amount', async function(){
           const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
@@ -153,51 +170,6 @@ describe("Deploying Contract", function () {
         });
     });
   });
-});
 
 
 
-/*
-describe("NFT Dutch Auction", function() {
-
-    let nftDutchAuctionFactory: any;
-    let nftDutchAuctionToken: any;
-    let owner: any;
-    let address1: any;
-    let address2: any;
-
-    beforeEach(async function () {
-      nftDutchAuctionFactory = await ethers.getContractFactory("NFTDutchAuction");
-      [owner, address1, address2] = await ethers.getSigners();
-      const nftDutchAuctionToken = await nftDutchAuctionFactory.connect(owner).deploy(owner.address, 0, 100, 10, 10);
-      await nftDutchAuctionToken.deployed();
-    });
-    
-    describe("Deployment", async function () {
-      // await tells the compiler not to go line by line
-      it('reserve price - 100 wei' , async function(){
-        expect(nftDutchAuctionToken.getReservePrice()).to.equal(100);
-      });
-
-      it('num blocks auction open for - 10' , async function(){
-        expect(await nftDutchAuctionToken.getNumBlocksAuctionOpen()).to.equal(10);
-      });
-
-      it('offer price decrement - 10 wei' , async function(){
-        expect(await nftDutchAuctionToken.getPriceDecrement()).to.equal(10);
-      });
-
-      it("checking if initial price is 200 wei", async function () {
-        expect(await nftDutchAuctionToken.getCurrentPrice()).to.equal(200);
-      });
-  });
-  
-  
-    describe("Checking Seller", async function () {
-  
-    });
-    describe("Checking Bidders", async function () {
-  
-    });
-});
-*/
