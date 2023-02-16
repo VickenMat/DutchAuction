@@ -83,6 +83,13 @@ describe("Deploying Contract", function () {
     expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
   });
 
+  describe("Set Mint Contract Address", function () {
+    it("checking mint contract address function", async function () {
+      const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
+      expect(await basicDutchAuctionToken.setMintContractAddress(owner.address));
+    });
+  });
+
   describe("Checking Seller", function () {
     it('is owner of this contract the seller', async function(){
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
