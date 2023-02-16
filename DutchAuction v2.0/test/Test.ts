@@ -5,9 +5,7 @@ import { ethers } from "hardhat";
 import { assert } from "console";
 import { MintNFT } from "../typechain-types";
 import { NFTDutchAuction } from "../typechain-types/contracts/NFTDutchAuction";
-import { any } from "hardhat/internal/core/params/argumentTypes";
-import { FactoryOptions } from "@nomiclabs/hardhat-ethers/types";
-import { Signer } from "ethers";
+// import { Signer } from "ethers";
 
 describe("MintNFT", function () {
   let MintNFT: any;
@@ -22,7 +20,7 @@ describe("MintNFT", function () {
     await mintNFT.deployed();
   });
 
-  describe("deployment", function () {
+  describe("deployment with max supply", function () {
     it("should set the max supply", async function () {
       expect(await mintNFT.maxSupply()).to.equal(10);
     });
@@ -45,4 +43,8 @@ describe("MintNFT", function () {
       );
     });
   });
+
+    
+
+
 });

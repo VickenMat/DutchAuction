@@ -38,6 +38,30 @@ contract NFTDutchAuction is Initializable {
 
     IMintNFT private mintNFT; // initializes interface to mintNFT
 
+    constructor(
+        address _erc721TokenAddress,
+        uint256 _nftTokenID,
+        uint256 _reservePrice,
+        uint256 _numBlocksAuctionOpen,
+        uint256 _offerPriceDecrement
+    ) {
+        reservePrice = _reservePrice;
+        numBlocksAuctionOpen = _numBlocksAuctionOpen;
+        offerPriceDecrement = _offerPriceDecrement;
+        // sets the initial price to the equation below
+        initialPrice =
+            _reservePrice +
+            _numBlocksAuctionOpen *
+            _offerPriceDecrement;
+        // assigning seller to the person who's currently connecting with the contract
+        seller = msg.sender;
+        // assigns the current block as the starting block
+        blockStart = block.number;
+        erc721TokenAddress = _erc721TokenAddress;
+        nftTokenID = _nftTokenID;
+    }
+
+    /*
     function initialize(
         address _erc721TokenAddress,
         uint256 _nftTokenID,
@@ -60,7 +84,7 @@ contract NFTDutchAuction is Initializable {
         erc721TokenAddress = _erc721TokenAddress;
         nftTokenID = _nftTokenID;
     }
-
+*/
     // takes nft minting contracts address as parameter
     function setMintContractAddress(IMintNFT _mintNFT) public {
         mintNFT = _mintNFT;
