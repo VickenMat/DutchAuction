@@ -132,4 +132,28 @@ contract NFTDutchAuction is Initializable {
     function getSellerAddress() public view returns (address) {
         return seller;
     }
+
+    // returns the reserve price
+    function getReservePrice() public view returns (uint256) {
+        return reservePrice;
+    }
+
+    // returns the number of blocks open auction is open for
+    function getNumBlocksAuctionOpen() public view returns (uint256) {
+        return numBlocksAuctionOpen;
+    }
+
+    // returns the price decrement
+    function getPriceDecrement() public view returns (uint256) {
+        return offerPriceDecrement;
+    }
+
+    function getWinner() public view returns (address) {
+        require(winner == msg.sender, "You are the winner"); // checks if the winner variable is the winning address
+        return winner;
+    }
+
+    function balanceOf(address) public view returns (uint256) {
+        return address(this).balance;
+    }
 }
