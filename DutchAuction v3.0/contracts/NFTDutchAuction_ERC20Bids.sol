@@ -38,7 +38,10 @@ contract NFTDutchAuction is Initializable {
 
     IMintNFT private mintNFT; // initializes interface to mintNFT
 
+    address erc20TokenAddress;
+
     constructor(
+        address _erc20TokenAddress,
         address _erc721TokenAddress,
         uint256 _nftTokenID,
         uint256 _reservePrice,
@@ -59,6 +62,7 @@ contract NFTDutchAuction is Initializable {
         blockStart = block.number;
         erc721TokenAddress = _erc721TokenAddress;
         nftTokenID = _nftTokenID;
+        erc20TokenAddress = _erc20TokenAddress;
     }
 
     /*
