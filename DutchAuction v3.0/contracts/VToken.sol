@@ -3,8 +3,9 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract VToken is ERC20 {
+contract VToken is ERC20, Ownable {
     uint256 initialSupply;
 
     constructor(uint256 _initialSupply) ERC20("VToken", "VT") {
