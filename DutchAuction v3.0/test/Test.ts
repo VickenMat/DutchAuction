@@ -70,7 +70,7 @@ describe("NFTDutchAuction", function () {
     const basicDutchAuctionFactory = await ethers.getContractFactory("NFTDutchAuction");
     // calling deploy() on a ContractFactory will start the deployment and return a promise that resovles to a contract
     // this is the object that has a method for each of your smart contract functions
-    const basicDutchAuctionToken = await basicDutchAuctionFactory.connect(owner).deploy(owner.address, 0, 100, 10, 10);
+    const basicDutchAuctionToken = await basicDutchAuctionFactory.connect(owner).deploy(owner.address, owner.address, 0, 100, 10, 10);
     // gets the balance of the owner account by calling balanceOf() method
     const ownerBalance  = await basicDutchAuctionToken.balanceOf(owner.address);
     // gets balance of 2 accounts
@@ -99,12 +99,6 @@ describe("NFTDutchAuction", function () {
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
     expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
   });
-  });
-  describe("setMintContractAddress", function () {
-    it("checking mint contract address function", async function () {
-      const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-      expect(await basicDutchAuctionToken.setMintContractAddress(owner.address));
-    });
   });
 
   describe("Checking Seller", function () {

@@ -10,6 +10,14 @@ contract VToken is ERC20, Ownable {
 
     constructor(uint256 _initialSupply) ERC20("VToken", "VT") {
         initialSupply = _initialSupply;
+        require(
+            initialSupply >= 1,
+            "Initial token supply must be greater than 0"
+        ); // throws error if max supply is set to 0
+        require(
+            initialSupply <= 10000,
+            "Max token supply must be less than or equal to 10,000"
+        ); // throws error if max supply is set to a number greater than 500
         _mint(msg.sender, _initialSupply); // _mint is the building block that allows us to write ERC20 extensions that implement a supply mechanism
     }
 
