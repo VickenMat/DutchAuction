@@ -140,7 +140,7 @@ contract NFTDutchAuction_ERC20Bids is Initializable {
         //     msg.value >= getCurrentPrice(),
         //     "You have not sent sufficient funds"
         // ); // check if the buyer has bid a sufficient amount
-        require(nftTokenID >= 0, "The NFT token ID is less than 0"); // checks if the nft id is negative
+        // require(nftTokenID >= 0, "The NFT token ID is less than 0"); // checks if the nft id is negative
         require(
             mintERC20.balanceOf(msg.sender) >= _bidAmount,
             "You have bid more tokens than you own"

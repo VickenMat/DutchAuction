@@ -29,11 +29,4 @@ contract VToken is ERC20, Ownable {
         );
         _mint(_address, amount); // _mint is the building block that allows us to write ERC20 extensions that implement a supply mechanism
     }
-
-    // token rewawrd for miners that produce Ethereum blocks
-    // block.coinbase accesses the address of the current block's miner
-    // mint reward token to this miner's address whenever someone calls this fn
-    function _mintMinerReward() public {
-        _mint(block.coinbase, maxSupply);
-    }
 }
