@@ -34,7 +34,7 @@ interface IMintERC20 {
     function transfer(address _to, uint256 _amount) external returns (bool);
 }
 
-contract NFTDutchAuction is Initializable {
+contract NFTDutchAuction_ERC20Bids is Initializable {
     uint256 reservePrice;
     uint256 numBlocksAuctionOpen;
     uint256 offerPriceDecrement;
