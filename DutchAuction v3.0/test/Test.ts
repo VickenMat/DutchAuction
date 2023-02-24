@@ -67,10 +67,10 @@ describe("Auction", function () {
     mintNFTToken = await nftContractCreator.deployed();
   });
 
-  it("Should set max supply of nfts minted to 10(index 0-9)", async function () {
+  it("Should set max supply of NFTs minted to 10(index 0-9)", async function () {
     expect(await mintNFTToken.maxSupply()).to.equal(10);
   });
-  it("should not mint more tokens than the max supply", async function () {
+  it("Should not mint more tokens than the max supply", async function () {
     for (let i = 0; i < 10; i++) {
       await mintNFTToken.safeMint(seller.address);
     }
@@ -78,11 +78,11 @@ describe("Auction", function () {
       "Max number of tokens minted"
     );
   });
-  it("tests nft minting", async function () {
+  it("Should test NFT minting", async function () {
     await expect(mintNFTToken.safeMint(seller.address));
   });
   
-  it("testing safeMint for bidders account", async function ()  {
+  it("Should test safeMint from bidders account", async function ()  {
     await expect(mintNFTToken.connect(account).safeMint(account.address));
   });
 
@@ -91,24 +91,24 @@ describe("Auction", function () {
     const mintNFTDutchAuction = await MintDutchAuctionFactory.deploy(mintERC20Token.address, mintNFTToken.address, 0, 200, 50, 4);
     nftDutchAuctionToken = await mintNFTDutchAuction.deployed();
   });
-  it("en", async function () {
+  it("Should check if sellers balance is currently 0", async function () {
     expect(await mintERC20Token.balanceOf(seller.address)).to.equal(0);
   });
-  it("checking if initial price is 400 VToken", async function () {
+  it("Should check if initial price is 400 VToken", async function () {
     expect(await nftDutchAuctionToken.getCurrentPrice()).to.equal(400);
   });
 
-  it("taking approval from nft contract for bid", async function () {
+  it("Approval from NFTDutchAuction contract for bid", async function () {
     await mintNFTToken.approve(nftDutchAuctionToken.address, 0);
   });
-  it("taking approval from erc20 contract for bid", async function () {
+  it("Approval from ERC20 contract for bid", async function () {
     await mintERC20Token.connect(account).approve(nftDutchAuctionToken.address, 450);
   });
-  it("testing the bid functionality before approval", async function () {
+  it("Should test bid functionality before approval", async function () {
     await expect(nftDutchAuctionToken.bid(450)).to.be.revertedWith("Owner cannot submit bid on own item");
   });
 
-  it("testing the bid functionality", async function () {
+  it("Should test the bid functionality", async function () {
     await nftDutchAuctionToken.connect(account).bid(400);
   });
 
