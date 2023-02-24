@@ -8,11 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 
 //Initializable,
-contract MintNFT is
-    ERC721Upgradeable,
-    ERC721URIStorageUpgradeable,
-    OwnableUpgradeable
-{
+contract MintNFT is ERC721Upgradeable, OwnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     CountersUpgradeable.Counter private _tokenIdCounter;
@@ -29,12 +25,11 @@ contract MintNFT is
     }
 
     // mints the nft
-    function safeMint(address to, string memory uri) public {
+    function safeMint(address to) public {
         uint256 tokenId = _tokenIdCounter.current(); // sets tokenId to the current number in the counter
         require(tokenId <= (maxSupply - 1), "Max number of tokens minted"); // checks if the number of minted nfts have surpassed the max supply we set earlier
         _tokenIdCounter.increment(); // increments token counter for every successful nft mint
         _safeMint(to, tokenId); // mints token to owners address and sets it to specific tokenId
-        _setTokenURI(tokenId, uri); // links tokenId with uri
     }
 
     /*
@@ -51,22 +46,4 @@ contract MintNFT is
         __Ownable_init();
     }
     */
-
-    // The following functions are overrides required by Solidity
-
-    function _burn(uint256 tokenId)
-        internal
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-    {
-        super._burn(tokenId);
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-        returns (string memory)
-    {
-        return super.tokenURI(tokenId);
-    }
 }
