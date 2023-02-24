@@ -20,10 +20,6 @@ contract VToken is ERC20, Ownable {
     function mintERC20Token(address _address, uint256 amount) public {
         uint256 total = totalSupply();
         require(
-            total <= maxSupply,
-            "Number of tokens minted to this address should be less than the max supply"
-        );
-        require(
             (total + amount) <= maxSupply,
             "Number of tokens minted to this address plus tokens in circulation should be less than the max supply"
         );
