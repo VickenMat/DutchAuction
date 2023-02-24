@@ -57,7 +57,7 @@ describe("VToken", () =>  {
     });
 
     it("Should not mint tokens if the total supply exceeds the max supply", async () => {
-      const amount = 0;
+      const amount = 20000;
       await expect(mintERC20Token.connect(owner).mintERC20Token(await addr1.getAddress(), amount)).to.be.revertedWith(
         "Number of tokens minted to this address plus tokens in circulation should be less than the max supply"
       );
