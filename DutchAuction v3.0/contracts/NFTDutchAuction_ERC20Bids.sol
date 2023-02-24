@@ -121,7 +121,7 @@ contract NFTDutchAuction is Initializable {
 
     // bid function makes checks, accepts or rejects bids, and executes the wei transfer if accepted
     function bid(uint256 _bidAmount) public payable returns (address) {
-        console.log("Bid amount is %d ", _bidAmount);
+        console.log(msg.sender, "has bid", _bidAmount, "VToken");
         require(isAuctionOpen, "Auction is closed"); // checks to make sure the auction is still open
         require(
             winner == address(0),

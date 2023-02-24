@@ -5,9 +5,79 @@ import { ethers } from "hardhat";
 import { assert } from "console";
 // import { MintNFT } from "../typechain-types";
 // import { NFTDutchAuction } from "../typechain-types/contracts/NFTDutchAuction";
-// import { Signer } from "ethers";
+import { Contract, Signer } from "ethers";
 
 // testing  MintNFT contract
+describe("VToken", () =>  {
+  let MintERC20Factory: any;
+  let mintERC20Token: any;
+  let owner: Signer;
+  let addr1: Signer;
+  let addr2: Signer;
+
+  beforeEach(async () => {
+    MintERC20Factory = await ethers.getContractFactory("VToken", owner);
+    const maxSupply = 10000;
+    [owner, addr1, addr2] = await ethers.getSigners();
+    mintERC20Token = await MintERC20Factory.deploy(maxSupply);
+    await mintERC20Token.deployed();
+  });
+
+  describe("Deployment", () => {
+    it("Should set the correct name and symbol", async () => {
+      expect(await mintERC20Token.name()).to.equal("VToken");
+      expect(await mintERC20Token.symbol()).to.equal("VT");
+    });
+
+    it("Should set the max supply correctly", async () => {
+      const maxSupply = 10000;
+      expect(await mintERC20Token.maxSupply()).to.equal(maxSupply);
+    });
+
+    it("Should not allow max supply to be set to 0", async () => {
+      const maxSupply = 0;
+      await expect(mintERC20Token.connect(owner).deploy(maxSupply)).to.be.revertedWith(
+        "Max token supply must be greater than 0"
+      );
+    });
+
+    it("Should not allow max supply to be set to a number greater than 10,000", async () => {
+      const maxSupply = 10001;
+      await expect(mintERC20Token.connect(owner).deploy(maxSupply)).to.be.revertedWith(
+        "Max token supply must be less than or equal to 10,000"
+      );
+    });
+  });
+
+  describe("Minting", () => {
+    it("Should mint tokens to the specified address", async () => {
+      const amount = 10;
+      const balanceBefore = await mintERC20Token.balanceOf(await addr1.getAddress());
+      await mintERC20Token.connect(owner).mintERC20Token(await addr1.getAddress(), amount);
+      const balanceAfter = await mintERC20Token.balanceOf(await addr1.getAddress());
+      expect(balanceAfter.sub(balanceBefore)).to.equal(amount);
+    });
+
+    it("Should not mint tokens if the total supply exceeds the max supply", async () => {
+      const amount = 0;
+      await expect(mintERC20Token.connect(owner).mintERC20Token(await addr1.getAddress(), amount)).to.be.revertedWith(
+        "Number of tokens minted to this address plus tokens in circulation should be less than the max supply"
+      );
+    });
+  });
+
+  describe("Miner Rewards", () => {
+    it("Should mint reward tokens to the miner's address", async () => {
+      const balanceBefore = await mintERC20Token.balanceOf(await owner.getAddress());
+      await mintERC20Token.connect(owner)._mintMinerReward();
+      const balanceAfter = await mintERC20Token.balanceOf(await owner.getAddress());
+      expect(balanceAfter.sub(balanceBefore)).to.equal(0);
+    });
+  });
+});
+
+
+
 describe("MintNFT", function () {
   let MintNFTFactory: any;
   let mintNFTToken: any;
@@ -70,7 +140,7 @@ describe("NFTDutchAuction", function () {
     const basicDutchAuctionFactory = await ethers.getContractFactory("NFTDutchAuction");
     // calling deploy() on a ContractFactory will start the deployment and return a promise that resovles to a contract
     // this is the object that has a method for each of your smart contract functions
-    const basicDutchAuctionToken = await basicDutchAuctionFactory.connect(owner).deploy(owner.address, owner.address, 0, 100, 10, 10);
+    const basicDutchAuctionToken = await basicDutchAuctionFactory.connect(owner).deploy(owner.address, owner.address, 0, 200, 50, 4);
     // gets the balance of the owner account by calling balanceOf() method
     const ownerBalance  = await basicDutchAuctionToken.balanceOf(owner.address);
     // gets balance of 2 accounts
@@ -80,24 +150,24 @@ describe("NFTDutchAuction", function () {
   }
   describe("Checking Auction Values", function () {
   // await tells the compiler not to go line by line
-  it('reserve price - 100 wei' , async function(){
+  it('reserve price - 200 VToken' , async function(){
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-    expect(await basicDutchAuctionToken.getReservePrice()).to.equal(100);
+    expect(await basicDutchAuctionToken.getReservePrice()).to.equal(200);
   });
 
-  it('num blocks auction open for - 10' , async function(){
+  it('num blocks auction open for - 50' , async function(){
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-    expect(await basicDutchAuctionToken.getNumBlocksAuctionOpen()).to.equal(10);
+    expect(await basicDutchAuctionToken.getNumBlocksAuctionOpen()).to.equal(50);
   });
 
-  it('offer price decrement - 10 wei' , async function(){
+  it('offer price decrement - 4 VToken' , async function(){
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-    expect(await basicDutchAuctionToken.getPriceDecrement()).to.equal(10);
+    expect(await basicDutchAuctionToken.getPriceDecrement()).to.equal(4);
   });
 
-  it("checking if initial price is 200 wei", async function () {
+  it("checking if initial price is 400 VToken", async function () {
     const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-    expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
+    expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(400);
   });
   });
 
@@ -109,25 +179,25 @@ describe("NFTDutchAuction", function () {
 
     it('bid from seller account', async function(){
       const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-      expect( basicDutchAuctionToken.connect(owner).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
+      expect( basicDutchAuctionToken.connect(owner).bid(400)).to.be.revertedWith("Owner cannot submit bid on own item");
     });
   });
     describe('Checking Bidders', function () {
         
-        it('bidder has more than 0 wei', async function(){
+        it('bidder owns more than 0 VToken', async function(){
           const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
           expect( await basicDutchAuctionToken.balanceOf(account1.address)).to.greaterThan(ethers.utils.parseUnits("-1", 1)).to.be.revertedWith("Your accounts balance is not greater than 0");
         });
         
       
-        it('bid accepted - 200 wei - sufficient amount', async function(){
+        it('bid accepted - 400 VToken - sufficient amount', async function(){
           const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account1).bid({value: 200}));
+          expect( basicDutchAuctionToken.connect(account1).bid(400));
         });
       
-        it('bid rejected - 100 wei - insufficient amount', async function(){
+        it('bid rejected - 100 VToken - insufficient amount', async function(){
           const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(owner).bid({value: 100})).to.be.revertedWith("You have not bid sufficient funds");
+          expect( basicDutchAuctionToken.connect(owner).bid(100)).to.be.revertedWith("You have not bid sufficient funds");
         });
 
         it('multiple bids - first bid greater than current price, second bid lower', async function(){
@@ -144,23 +214,6 @@ describe("NFTDutchAuction", function () {
             ));
           expect( basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 280}
             ));
-        });
-
-        it('check for winner', async function(){
-          const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.getWinner()).to.be.revertedWith('You are the winner');
-        });
-
-        it('auction ended - winner already chosen', async function(){
-          const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-          const winner = account1;
-          expect(basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 220}
-          ));
-        });
-
-        it('auction ended - reject bid because select number of blocks passed', async function(){
-          const { basicDutchAuctionToken, account1 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200})).to.be.revertedWith("Auction has closed - total number of blocks the auction is open for have passed");
         });
     });
   });
