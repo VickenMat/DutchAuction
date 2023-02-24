@@ -152,7 +152,7 @@ contract NFTDutchAuction_ERC20Bids is Initializable {
 
         winner = msg.sender; // assigns winner to address with first winning bid - finalize fn
         // payable(seller).transfer(msg.value); // transfers wei from bidder to seller
-        mintERC20.transferFrom(winner, seller, _bidAmount);
+        mintERC20.transferFrom(winner, seller, getCurrentPrice());
         console.log("Owners address %s", winner);
         mintNFT.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
 
@@ -179,9 +179,5 @@ contract NFTDutchAuction_ERC20Bids is Initializable {
     // returns the price decrement
     function getPriceDecrement() public view returns (uint256) {
         return offerPriceDecrement;
-    }
-
-    function balanceOf(address) public view returns (uint256) {
-        return address(this).balance;
     }
 }

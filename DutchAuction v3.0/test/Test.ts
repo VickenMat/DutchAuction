@@ -91,6 +91,9 @@ describe("Auction", function () {
     const mintNFTDutchAuction = await MintDutchAuctionFactory.deploy(mintERC20Token.address, mintNFTToken.address, 0, 200, 50, 4);
     nftDutchAuctionToken = await mintNFTDutchAuction.deployed();
   });
+  it("en", async function () {
+    expect(await mintERC20Token.balanceOf(seller.address)).to.equal(0);
+  });
   it("checking if initial price is 400 VToken", async function () {
     expect(await nftDutchAuctionToken.getCurrentPrice()).to.equal(400);
   });
@@ -127,7 +130,7 @@ describe("Auction", function () {
   });
 
   it("Checking to see if the NFT seller received the VTokens", async function () {
-    expect(await mintERC20Token.balanceOf(account.address));
+    expect(await mintERC20Token.balanceOf(seller.address)).to.equal(await nftDutchAuctionToken.getCurrentPrice());
   });
 });
 
