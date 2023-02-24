@@ -29,23 +29,21 @@ describe("VToken", () =>  {
       expect(await mintERC20Token.symbol()).to.equal("VT");
     });
 
-    it("Should set the max supply correctly", async () => {
+    it("Should set the max supply correctly to 10,000", async () => {
       const maxSupply = 10000;
       expect(await mintERC20Token.maxSupply()).to.equal(maxSupply);
     });
 
     it("Should not allow max supply to be set to 0", async () => {
       const maxSupply = 0;
-      await expect(mintERC20Token.connect(owner).deploy(maxSupply)).to.be.revertedWith(
-        "Max token supply must be greater than 0"
-      );
+      const badMintERC20Factory = await ethers.getContractFactory("VToken", owner);
+      expect(badMintERC20Factory.deploy(0)).to.be.revertedWith("Max token supply must be greater than 0");
     });
 
     it("Should not allow max supply to be set to a number greater than 10,000", async () => {
       const maxSupply = 10001;
-      await expect(mintERC20Token.connect(owner).deploy(maxSupply)).to.be.revertedWith(
-        "Max token supply must be less than or equal to 10,000"
-      );
+      const tooLargeMintERC20Factory = await ethers.getContractFactory("VToken", owner);
+      expect(tooLargeMintERC20Factory.deploy(10001)).to.be.revertedWith("Max token supply must be less than or equal to 10,000");
     });
   });
 
@@ -196,24 +194,20 @@ describe("NFTDutchAuction", function () {
         });
       
         it('bid rejected - 100 VToken - insufficient amount', async function(){
-          const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(owner).bid(100)).to.be.revertedWith("You have not bid sufficient funds");
+          const { basicDutchAuctionToken, account2 } = await loadFixture(deployDutchAuction);
+          expect( basicDutchAuctionToken.connect(account2).bid(100)).to.be.revertedWith("You have not bid sufficient funds");
         });
 
         it('multiple bids - first bid greater than current price, second bid lower', async function(){
           const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 220}
-        ));
-        expect( basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 180}
-          ));
+          expect( basicDutchAuctionToken.connect(account1).bid(425));
+          expect( basicDutchAuctionToken.connect(account2).bid(200));
         });
     
         it('multiple bids - both bids higher than current price', async function(){
           const { basicDutchAuctionToken, account1, account2 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 300}
-            ));
-          expect( basicDutchAuctionToken.connect(account2).bid({from: account2.address, value: 280}
-            ));
+          expect( basicDutchAuctionToken.connect(account1).bid(500));
+          expect( basicDutchAuctionToken.connect(account2).bid(450));
         });
     });
   });

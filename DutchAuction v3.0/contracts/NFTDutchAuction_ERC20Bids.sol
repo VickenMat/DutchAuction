@@ -162,6 +162,7 @@ contract NFTDutchAuction is Initializable {
 
     // returns the sellers address
     function getSellerAddress() public view returns (address) {
+        console.log("Sellers address %s", seller);
         return seller;
     }
 

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VToken is ERC20, Ownable {
-    uint256 maxSupply;
+    uint256 public maxSupply;
 
     constructor(uint256 _maxSupply) ERC20("VToken", "VT") {
         maxSupply = _maxSupply;
