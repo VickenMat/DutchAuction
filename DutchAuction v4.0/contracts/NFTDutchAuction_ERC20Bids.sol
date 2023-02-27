@@ -49,7 +49,7 @@ contract NFTDutchAuction_ERC20Bids is
     address public winner;
 
     uint256 blockStart;
-    uint256 totalBids = 0;
+    uint256 totalBids;
     uint256 refundAmount;
     bool public isAuctionOpen;
 
@@ -57,10 +57,6 @@ contract NFTDutchAuction_ERC20Bids is
     IMintERC20 mintERC20;
 
     address erc20TokenAddress;
-
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(
         address _erc20TokenAddress,
@@ -90,7 +86,7 @@ contract NFTDutchAuction_ERC20Bids is
         erc20TokenAddress = _erc20TokenAddress;
         mintERC20 = IMintERC20(erc20TokenAddress);
         mintNFT = IMintNFT(erc721TokenAddress);
-
+        totalBids = 0;
         isAuctionOpen = true;
     }
 

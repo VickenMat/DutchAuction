@@ -1,6 +1,6 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { assert } from "console";
 
 describe("Auction", function () {
@@ -87,9 +87,17 @@ describe("Auction", function () {
   // deplys NFTDutchAuction contract
   it("NFTDutchAuction Contract Deployment", async function () {
     const MintDutchAuctionFactory = await ethers.getContractFactory("NFTDutchAuction_ERC20Bids");
-    const mintNFTDutchAuction = await MintDutchAuctionFactory.deploy(mintERC20Token.address, mintNFTToken.address, 0, 200, 50, 4);
+    const mintNFTDutchAuction = await upgrades.deployProxy(
+    MintDutchAuctionFactory,
+    [mintERC20Token.address, mintNFTToken.address, 0, 200, 50, 4],
+    {
+      kind: "uups",
+      initializer: "initialize(address, address, uint256, uint256, uint256, uint256)"
+    });
     nftDutchAuctionToken = await mintNFTDutchAuction.deployed();
-  });
+    console.log(nftDutchAuctionToken);
+    });
+
   // checks sellers balance
   it("Should check if sellers balance is currently 0", async function () {
     expect(await mintERC20Token.balanceOf(seller.address)).to.equal(0);
