@@ -1,4 +1,4 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+// import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { assert } from "console";
@@ -84,8 +84,8 @@ describe("Auction", function () {
   it("Should test safeMint from bidders account", async function ()  {
     await expect(mintNFTToken.connect(account).safeMint(account.address));
   });
-  // deplys NFTDutchAuction contract
-  it("NFTDutchAuction Contract Deployment", async function () {
+  // deploys NFTDutchAuction contract and proxy and initializes with given variables
+  it("NFTDutchAuction Contract Deployment through Proxy", async function () {
     const MintDutchAuctionFactory = await ethers.getContractFactory("NFTDutchAuction_ERC20Bids");
     const mintNFTDutchAuction = await upgrades.deployProxy(
     MintDutchAuctionFactory,
