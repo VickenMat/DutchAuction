@@ -17,7 +17,7 @@ contract VToken is ERC20, Ownable {
         ); // throws error if max supply is set to a number greater than 500
     }
 
-    function mintERC20Token(address to, uint256 amount) public {
+    function mintERC20(address to, uint256 amount) public {
         uint256 total = totalSupply();
         require(
             (total + amount) <= maxSupply,

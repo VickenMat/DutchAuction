@@ -96,7 +96,7 @@ contract NFTDutchAuction_ERC20Bids is
 
     // bid function makes checks, accepts or rejects bids, and executes the wei transfer if accepted
     function bid(uint256 _bidAmount) public payable returns (address) {
-        console.log(msg.sender, "has bid", _bidAmount, "VToken");
+        console.log(msg.sender, "bid", _bidAmount, "VToken");
         require(isAuctionOpen, "Auction is closed"); // checks to make sure the auction is still open
         require(
             winner == address(0),
@@ -128,7 +128,6 @@ contract NFTDutchAuction_ERC20Bids is
         winner = msg.sender; // assigns winner to address with first winning bid - finalize fn
         // payable(seller).transfer(msg.value); // transfers wei from bidder to seller
         mintERC20.transferFrom(winner, seller, getCurrentPrice());
-        console.log("Owners address %s", winner);
         mintNFT.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
 
         isAuctionOpen = false; // sets isAuctionOpen variable to false
@@ -137,7 +136,6 @@ contract NFTDutchAuction_ERC20Bids is
 
     // returns the sellers address
     function getSellerAddress() public view returns (address) {
-        console.log("Sellers address %s", seller);
         return seller;
     }
 

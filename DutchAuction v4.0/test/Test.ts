@@ -1,4 +1,3 @@
-// import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { assert } from "console";
@@ -31,7 +30,8 @@ describe("Auction", function () {
   });
   // mints 5000 VTokens
   it("Should mint 5,000 VTokens", async function () {
-    expect(mintERC20Token.mintERC20Token(account.address, 5000));
+    expect(mintERC20Token.mintERC20(account.address, 5000));
+    console.log("Mints 5,000 VToken to", (account.address));
   });
   it("Should set the max supply correctly to 10,000", async () => {
     const maxSupply = 10000;
@@ -51,7 +51,7 @@ describe("Auction", function () {
   });
   // checks to see if tokens are being minted after max supply has been minted
   it("Should not mint tokens after max supply have been minted", async function () {
-    expect(mintERC20Token.mintERC20Token(seller.address, 10000)).to.be.revertedWith("Number of tokens minted to this address should be less than the max supply");
+    expect(mintERC20Token.mintERC20(seller.address, 10000)).to.be.revertedWith("Number of tokens minted to this address should be less than the max supply");
   });
 
 // deploys MintNFT contract
@@ -79,6 +79,7 @@ describe("Auction", function () {
   // mints NFT
   it("Should test NFT minting", async function () {
     await expect(mintNFTToken.safeMint(seller.address));
+    console.log("Mints NFT to", (seller.address));
   });
   // checks safeMint function from external address
   it("Should test safeMint from bidders account", async function ()  {
@@ -96,6 +97,11 @@ describe("Auction", function () {
     });
     nftDutchAuctionToken = await mintNFTDutchAuction.deployed();
     console.log(nftDutchAuctionToken);
+    console.log("NFTDutchAuction contract address is", (nftDutchAuctionToken.address));
+    console.log("MintNFT contract address is", (mintNFTToken.address));
+    console.log("VToken contract address is", (mintERC20Token.address));
+    console.log("NFT owner/seller address is", (seller.address));
+    console.log("VToken creator/bidder address is", (account.address));
     });
 
   // checks sellers balance
@@ -109,17 +115,19 @@ describe("Auction", function () {
   // checks approval from NFTDutchAuction contract for MintNFT
   it("Approval from NFTDutchAuction contract for bid", async function () {
     await mintNFTToken.approve(nftDutchAuctionToken.address, 0);
+    console.log("MintNFT contract",(mintNFTToken.address),"approving NFTDutchAuction contract",nftDutchAuctionToken.address,"from NFT seller",seller.address);
   });
   // checks approval from NFTDutchAuction contract for VToken 
   it("Approval from ERC20 contract for bid", async function () {
     await mintERC20Token.connect(account).approve(nftDutchAuctionToken.address, 450);
+    console.log("VToken contract",(mintERC20Token.address),"approving NFTDutchAuction contract",nftDutchAuctionToken.address,"from VToken owner",account.address);
   });
   // bids 450 VToken before contract being approved
-  it("Should test bid functionality before approval", async function () {
+  it("Should not allow bidding before contract approval", async function () {
     await expect(nftDutchAuctionToken.bid(450)).to.be.revertedWith("Owner cannot submit bid on own item");
   });
   // bids 400 VToken after contract is approved
-  it("Should test the bid functionality", async function () {
+  it("Should test the bid functionality after approving", async function () {
     await nftDutchAuctionToken.connect(account).bid(400);
   });
   // checks reserve price variable
