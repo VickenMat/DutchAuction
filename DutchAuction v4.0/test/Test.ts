@@ -96,7 +96,7 @@ describe("Auction", function () {
       initializer: "initialize(address, address, uint256, uint256, uint256, uint256)"
     });
     nftDutchAuctionToken = await mintNFTDutchAuction.deployed();
-    console.log(nftDutchAuctionToken);
+    //console.log(nftDutchAuctionToken);
     console.log("NFTDutchAuction contract address is", (nftDutchAuctionToken.address));
     console.log("MintNFT contract address is", (mintNFTToken.address));
     console.log("VToken contract address is", (mintERC20Token.address));
