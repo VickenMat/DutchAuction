@@ -1,5 +1,6 @@
-// 'npm run test' in terminal
+/*
 
+// 'npm run test' in terminal
 
 const assert = require('assert');
 // ganache hosts a local test network
@@ -98,3 +99,4 @@ describe('Car', () => {
     });
 });
 */
+

@@ -1,16 +1,30 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const [nftDeployer, tokenDeployer, owner] = await ethers.getSigners();
 
-  console.log("Deploying contracts with the account:", deployer.address);
+  console.log("Minting VTokens to", tokenDeployer.address);
+  console.log("Account balance:", (await tokenDeployer.getBalance()).toString());
+  const Token = await ethers.getContractFactory("VToken");
+  const token = await Token.deploy(5000);
 
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+  console.log("Deploying contracts with the account", nftDeployer.address);
+  console.log("Minting NFT to", nftDeployer.address);
+  const NFT = await ethers.getContractFactory("MintNFT");
+  const nft = await NFT.deploy(10);
+  
+  console.log("Deploying DutchAuction contract to", nftDeployer.address);
+  const dutchAuction = await ethers.getContractFactory("NFTDutchAuction_ERC20Bids");
+  const mintNFTDutchAuction = await upgrades.deployProxy(
+    dutchAuction,
+    [token.address, nft.address, 0, 200, 50, 4],
+    {
+      kind: "uups",
+      initializer: "initialize(address, address, uint256, uint256, uint256, uint256)"
+    });
 
-  const Token = await ethers.getContractFactory("Token");
-  const token = await Token.deploy();
-
-  console.log("Token address:", token.address);
+  console.log("VToken contract address:", token.address);
+  console.log("NFTMint contract address:", nft.address);
 }
 
 main()
