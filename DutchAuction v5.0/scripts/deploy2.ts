@@ -1,7 +1,7 @@
 /*
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const Web3 = require('web3');
-const { abi, evm } = require('./compile');
+const { abi, evm } = require('compile'); // used to be ./compile to move back a directory
 
 const provider = new HDWalletProvider(
     'scare diary later practice toast dress liquid visual sorry kitchen debris say',
@@ -19,7 +19,7 @@ const deploy = async () => {
     console.log('Attempting to deploy from account:', accounts[0]);
 
     const result = await new web3.eth.Contract(abi) 
-        .deploy({ data: '0x' + evm.bytecode.object, arguments: ['Hello'] })
+        .deploy({ data: '0x' + evm.bytecode.object})
         .send({ from: accounts[0], gas: '1000000'});
 
     console.log('Contract deployed to', result.options.address);

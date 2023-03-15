@@ -1,7 +1,4 @@
 /*
-
-// 'npm run test' in terminal
-
 const assert = require('assert');
 // ganache hosts a local test network
 const ganache = require('ganache-cli');
@@ -16,8 +13,8 @@ const web3 = new Web3(ganache.provider());
 const { abi, evm } = require('../compile');
 
 // account to deploy contract
-let accounts;
-let inbox;
+let accounts: any;
+let inbox: any;
 const text = 'Hi there';
 // to use await, you need to make sure the function is async 
 // await is better syntax than promises

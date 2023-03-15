@@ -1,7 +1,19 @@
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { assert } from "console";
-
+/*
+// ganache hosts a local test network
+const ganache = require('ganache-cli');
+// uppercase because constructor used to make instances of thw Web3 library - only make referenece to this one time
+// portal to the Ethereum world
+const Web3 = require('web3');
+// instance of web3 and tells it to connect to a test network we created on our machine
+// when connecting to other networks, we will replace ganache.provider() with what we want
+// must have provider
+const web3 = new Web3(ganache.provider());
+// gives us the definition of what a contract is
+const { abi, evm } = require('../compile');
+*/
 describe("Auction", function () {
   let seller: any;
   let account: any;
@@ -151,3 +163,43 @@ describe("Auction", function () {
     expect(await mintERC20Token.balanceOf(seller.address)).to.equal(await nftDutchAuctionToken.getCurrentPrice());
   });
 });
+
+/*
+// helper library
+import assert from 'assert';
+import { compiledContract } from '../scripts/compile';
+// import { enterPlayerInLottery } from 'utils/helper';
+// npm install web3     in terminal for this to worl
+import Web3 from 'web3';
+// import { Dai } from '..generatedTypes/dai';
+
+// local test network that only gets created when we start running our tests
+const ganache = require('ganache-cli');
+// provider is what allows us to connect to a given network, can change from ganache to something else
+const provider = ganache.provider();
+// require in interface
+// THIS IS THE ISSUE WITH RUNNING TEST
+const { abi, evm } = compiledContract;
+// set up instance of web3
+const web3 = new Web3(provider);
+
+let lottery: any;
+let accounts: string[];
+
+beforeEach(async () => {
+    // get list of all accounts
+    accounts = await web3.eth.getAccounts();
+    // use one of those accounts to deploy the contract
+    lottery = (await new web3.eth.Contract(abi)
+        .deploy({ data: '0x' + evm.bytecode.object, })
+        .send({
+            from: accounts[0], gas: 1000000,
+        }));
+});
+
+describe('Lottery Contract', () => {
+    it('deploys a contract', () => {
+        assert.ok(lottery.options.address);
+    });
+});
+*/
