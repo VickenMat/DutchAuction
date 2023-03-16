@@ -154,9 +154,7 @@ contract NFTDutchAuction_ERC20Bids is
         return offerPriceDecrement;
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal view override onlyOwner {}
 }
