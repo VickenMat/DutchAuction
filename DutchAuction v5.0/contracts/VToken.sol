@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.17;
 
+// import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 
 contract VToken is ERC20, ERC20Permit, Ownable {
     uint256 public maxSupply;

@@ -1,6 +1,8 @@
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { assert } from "console";
+import { VToken } from "../typechain-types";
+import { BigNumber, Contract, Signer } from "ethers";
 /*
 // ganache hosts a local test network
 const ganache = require('ganache-cli');
@@ -17,6 +19,7 @@ const { abi, evm } = require('../compile');
 describe("Auction", function () {
   let seller: any;
   let account: any;
+  let buyer: any;
 
   let erc20ContractCreator: any;
   let mintERC20Token: any;
@@ -35,6 +38,66 @@ describe("Auction", function () {
     erc20ContractCreator = await MintERC20Factory.deploy(10000);
     mintERC20Token = await erc20ContractCreator.deployed();
   });
+
+  
+  async function getPermitSignature(signer:any, token:Contract, spender:string, value:BigNumber, deadline:BigNumber) {
+    const [nonce, name, version, chainId] = await Promise.all([
+        token.nonces(signer.address),
+        token.name(),
+        "1",
+        signer.getChainId(),
+    ])
+    return ethers.utils.splitSignature(
+        await signer._signTypedData(
+          
+            {
+                name,
+                version,
+                chainId,
+                verifyingContract: token.address,
+            },
+            
+            {
+                Permit: [
+                    {
+                        name: "owner",
+                        type: "address",
+                    },
+                    {
+                        name: "spender",
+                        type: "address",
+                    },
+                    {
+                        name: "value",
+                        type: "uint256",
+                    },
+                    {
+                        name: "nonce",
+                        type: "uint256",
+                    },
+                    {
+                        name: "deadline",
+                        type: "uint256",
+                    },
+                ],
+            },
+            {
+                owner: signer.address,
+                spender,
+                value,
+                nonce,
+                deadline,
+            }
+            
+        )
+        
+    )
+    console.log('t4');
+}
+
+
+
+
   // checks to see if the name and symbol is correct
   it("Should set the correct name and symbol", async () => {
     expect(await mintERC20Token.name()).to.equal("VToken");
@@ -65,6 +128,7 @@ describe("Auction", function () {
   it("Should not mint tokens after max supply have been minted", async function () {
     expect(mintERC20Token.mintERC20(seller.address, 10000)).to.be.revertedWith("Number of tokens minted to this address should be less than the max supply");
   });
+
 
 // deploys MintNFT contract
   it("MintNFT Contract Deployment", async function ()  {
@@ -97,6 +161,9 @@ describe("Auction", function () {
   it("Should test safeMint from bidders account", async function ()  {
     await expect(mintNFTToken.connect(account).safeMint(account.address));
   });
+
+
+  
   // deploys NFTDutchAuction contract and proxy and initializes with given variables
   it("NFTDutchAuction Contract Deployment through Proxy", async function () {
     const MintDutchAuctionFactory = await ethers.getContractFactory("NFTDutchAuction_ERC20Bids");
@@ -162,6 +229,32 @@ describe("Auction", function () {
   it("Checking to see if the NFT seller received the VTokens", async function () {
     expect(await mintERC20Token.balanceOf(seller.address)).to.equal(await nftDutchAuctionToken.getCurrentPrice());
   });
+
+
+  describe("ERC20Permit Testing", function () {
+    it("Checking token allowance", async function () {
+      // const {ercTokenFactory, nftDutchAuction, otherAddress} = await loadFixture(NFTDutchAuction_ERC20Bids__factory);
+      const deadline = ethers.constants.MaxUint256;
+      const amount = BigNumber.from(1000);
+      
+      const { v, r, s } = await getPermitSignature(
+          seller,
+          mintERC20Token,
+          nftDutchAuctionToken.address,
+          amount,
+          deadline
+      )
+      await expect (mintERC20Token.permit(
+          seller,
+          nftDutchAuctionToken.address,
+          amount,
+          deadline,
+          v,r,s
+      )
+      )
+    });
+  })
+  
 });
 
 /*
