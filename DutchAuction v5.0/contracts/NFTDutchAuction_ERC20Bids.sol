@@ -32,6 +32,19 @@ interface IMintERC20 {
     function transfer(address _to, uint256 _amount) external returns (bool);
 }
 
+/*
+interface IERC20Permit {
+    function ERC20Permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint256 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+}
+*/
 contract NFTDutchAuction_ERC20Bids is
     Initializable,
     OwnableUpgradeable,
