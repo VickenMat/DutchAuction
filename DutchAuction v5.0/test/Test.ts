@@ -87,16 +87,10 @@ describe("Auction", function () {
                 value,
                 nonce,
                 deadline,
-            }
-            
-        )
-        
+            }   
+        )   
     )
-    console.log('t4');
 }
-
-
-
 
   // checks to see if the name and symbol is correct
   it("Should set the correct name and symbol", async () => {
@@ -230,7 +224,7 @@ describe("Auction", function () {
     expect(await mintERC20Token.balanceOf(seller.address)).to.equal(await nftDutchAuctionToken.getCurrentPrice());
   });
 
-
+// this it block tests ERC20Permit functionality for v5.0
   describe("ERC20Permit Testing", function () {
     it("Checking token allowance", async function () {
       // const {ercTokenFactory, nftDutchAuction, otherAddress} = await loadFixture(NFTDutchAuction_ERC20Bids__factory);
