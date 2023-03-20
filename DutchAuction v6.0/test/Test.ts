@@ -87,7 +87,7 @@ describe("Deploying Contract", function () {
 
         it('check for winner', async function(){
           const { basicDutchAuctionToken, owner } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.getWinner()).to.be.revertedWith('You are the winner');
+          expect( basicDutchAuctionToken.getWinnerAddress()).to.be.revertedWith('You are the winner');
         });
 
         it('auction ended - winner already chosen', async function(){
@@ -102,11 +102,6 @@ describe("Deploying Contract", function () {
           expect( basicDutchAuctionToken.connect(account1).bid({from: account1.address, value: 200})).to.be.revertedWith("Auction has closed - total number of blocks the auction is open for have passed");
         });
 
-        it('refund losing bids', async function(){
-          const { basicDutchAuctionToken, account2 } = await loadFixture(deployDutchAuction);
-          expect( basicDutchAuctionToken.connect(account2).refund(10
-            ));
-        });
     });
   });
 });

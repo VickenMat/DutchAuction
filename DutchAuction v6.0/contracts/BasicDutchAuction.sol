@@ -14,13 +14,13 @@ contract BasicDutchAuction {
     uint256 immutable offerPriceDecrement;
     uint256 immutable initialPrice;
 
-    address payable immutable seller;
-    address payable public winner;
+    address seller;
+    address public winner;
 
     uint256 blockStart;
     uint256 totalBids = 0;
     uint256 refundAmount;
-    bool isAuctionOpen = true;
+    bool public isAuctionOpen = true;
     mapping(address => uint256) balances; // unused for now
 
     constructor(
@@ -37,7 +37,7 @@ contract BasicDutchAuction {
             _numBlocksAuctionOpen *
             _offerPriceDecrement;
         // assigning seller to the person who's currently connecting with the contract
-        seller = payable(msg.sender);
+        seller = msg.sender;
         // assigns the current block as the starting block
         blockStart = block.number;
     }
@@ -64,59 +64,38 @@ contract BasicDutchAuction {
 
     // bid function makes checks, accepts or rejects bids, and executes the wei transfer if accepted
     function bid() public payable returns (address) {
-        require(isAuctionOpen == true, "Auction is open"); // checks to make sure the auction is still open
+        require(isAuctionOpen, "Auction is closed"); // checks to make sure the auction is still open
         require(
             winner == address(0),
-            "You just missed out! There is already a winner for this item" // check if there is a winner
-        );
+            "You just missed out! There is already a winner for this item"
+        ); // check if there is a winner
         require(msg.sender != seller, "Owner cannot submit bid on own item"); // check if the owner bids on own item
         require(
             block.number - blockStart <= numBlocksAuctionOpen,
-            "Auction has closed - total number of blocks the auction is open for have passed" // check if the duration of the auction has passed by seeing what block we're on
-        );
+            "Auction has closed - total number of blocks the auction is open for have passed"
+        ); // check if the duration of the auction has passed by seeing what block we're on
         require(
             address(this).balance > 0,
-            "Your accounts balance is not greater than 0" // checks if the bidding address's balance is greater than 0
-        );
+            "Your accounts balance is not greater than 0"
+        ); // checks if the bidding address's balance is greater than 0
         require(
             msg.value >= getCurrentPrice(),
-            "You have not sent sufficient funds" // check if the buyer has bid a sufficient amount
-        );
+            "You have not sent sufficient funds"
+        ); // check if the buyer has bid a sufficient amount
 
         totalBids++; // increments totalBids by 1 every time a bid is entered
 
-        // bidders.push(payable(msg.sender)); // allows contract to append the bidders array with all successful bidder addresses
+        require(totalBids > 0, "There must be at least one bid to finalize"); // checks if there is at least one bid on item
 
-        uint256 price = getCurrentPrice(); // gets updated price
+        winner = msg.sender; // assigns winner to address with first winning bid - finalize fn
+        payable(seller).transfer(msg.value); // transfers wei from bidder to seller
 
-        finalize(); // assigns winner to the person who placed the first winning bid
-
-        refundAmount = msg.value - price; // calculates refund amount
-        refund(refundAmount); // calls refund functions and has a parameter of how much to refund
-
-        seller.transfer(msg.value - refundAmount); // transfers wei from bidder to seller
         isAuctionOpen = false; // sets isAuctionOpen variable to false
         return winner;
     }
 
-    // assigns the winning address to winner variable
-    function finalize() public {
-        require(totalBids > 0, "There must be at least one bid to finalize"); // checks if there is at least one bid on item
-        winner = payable(msg.sender); // assigns winner variable to winning address
-    }
-
-    // refunds the bids to all the wallets with losing bids
-    function refund(uint256 _refundAmount) public payable {
-        require(seller != winner, "Seller cannot refund themselves"); // checks if the seller is trying to refund themselves
-        require(address(0) != winner, "You won the auction! Nothing to refund"); // checks if the winner is trying to get a refund
-        if (_refundAmount > 0) {
-            // checks if the refund amount is greater than 0
-            payable(msg.sender).transfer(_refundAmount); // refunds address
-        }
-    }
-
     // returns the address of the winning bid
-    function getWinner() public view returns (address) {
+    function getWinnerAddress() public view returns (address) {
         require(winner == msg.sender, "You are the winner"); // checks if the winner variable is the winning address
         return winner;
     }
@@ -130,13 +109,4 @@ contract BasicDutchAuction {
     function balanceOf(address) public view returns (uint256) {
         return address(this).balance;
     }
-
-    /*
-    address payable[] bidders; // creates an empty array of addresses
-
-    // returns a list of all bidder addresses
-    function getBidders() public view returns (address payable[] memory) {
-        return bidders;
-    }
-    */
 }
