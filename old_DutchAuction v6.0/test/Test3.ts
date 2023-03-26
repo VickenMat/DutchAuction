@@ -24,7 +24,7 @@ describe("BasicDutchAuction Testing", function () {
 
     describe("Checking Auction Parameters", function(){
       it("logging addresses", async function () {
-        console.log("t1");
+        console.log("t1"); 
         console.log("Contract Address is",basicDutchAuctionToken.address);
         console.log("t2");
         console.log("Seller Address is",seller.address);
