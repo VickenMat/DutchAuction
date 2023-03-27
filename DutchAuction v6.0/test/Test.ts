@@ -5,6 +5,7 @@ import { assert } from "console";
 describe("BasicDutchAuction Testing", function () {
   let seller: any;
   let account1: any;
+  let account2: any;
   let basicDutchAuctionToken: any;
 
   /*
@@ -13,9 +14,10 @@ describe("BasicDutchAuction Testing", function () {
     });
   */
     beforeEach("deploys BasicDutchAuction.sol contract", async function () {
-      const [owner, address1] = await ethers.getSigners();
+      const [owner, address1, address2] = await ethers.getSigners();
       seller = owner;
       account1 = address1;
+      account2 = address2;
       const MintDutchAuctionFactory = await ethers.getContractFactory("BasicDutchAuction");
       const mintDutchAuction = await MintDutchAuctionFactory.deploy(100, 10, 10);
       basicDutchAuctionToken = await mintDutchAuction.deployed();
@@ -23,9 +25,10 @@ describe("BasicDutchAuction Testing", function () {
 
     describe("Checking Auction Parameters", function(){
       it("logging addresses", async function () {
-        console.log("Contract Address is",basicDutchAuctionToken.address);
+        console.log("BasicDutchAuction Contract Address is",basicDutchAuctionToken.address);
         console.log("Seller Address is",seller.address);
-        console.log("Account 1 Address is",account1.address);
+        console.log("Winning Bidder(Account 1) Address is",account1.address);
+        console.log("2nd Bidder(Account 2) Address is",account2.address);
       });
       it("initial price - 200 wei", async function () {
         expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
@@ -58,11 +61,30 @@ describe("BasicDutchAuction Testing", function () {
           it('bid from seller account', async function(){
             expect(basicDutchAuctionToken.connect(seller).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
           });
-          it("unsuccessfully bid below current price -150 wei", async function () {
+          it("bid rejected - 150 wei - insuffiecient amount", async function () {
             expect(basicDutchAuctionToken.connect(account1).bid({value: 150})).to.be.revertedWith("You have not sent sufficient funds");
           });
-          it("successfully bid at/above current price - 200 wei", async function () {
+          it("bid accepted - 200 wei - sufficient amount", async function () {
             expect(basicDutchAuctionToken.connect(account1).bid({value: 200}))
+          });
+          it("multiple bids - first bid > current price - second bid < current price", async function () {
+            expect(basicDutchAuctionToken.connect(account1).bid({value: 200}));
+            expect(basicDutchAuctionToken.connect(account2).bid({value: 100}));
+          });
+          it("multiple bids - both bids > current price", async function () {
+            expect(basicDutchAuctionToken.connect(account1).bid({value: 250}));
+            expect(basicDutchAuctionToken.connect(account2).bid({value: 250}));
+          });
+          it('check for winner', async function(){
+            expect( basicDutchAuctionToken.getWinnerAddress()).to.be.revertedWith('You are the winner');
+          });
+          it('auction ended - winner already chosen', async function(){
+            const winner = account1;
+            console.log(winner.address);
+            expect(basicDutchAuctionToken.connect(account2).bid({value: 220}));
+          });
+          it('auction ended - reject bid because select number of blocks passed', async function(){
+            expect( basicDutchAuctionToken.connect(account1).bid({value: 200})).to.be.revertedWith("Auction has closed - total number of blocks the auction is open for have passed")
           });
           it("Checking to see if the seller received the wei", async function () {
             expect(await basicDutchAuctionToken.balanceOf(seller.address)).to.equal(0);//(await basicDutchAuctionToken.getCurrentPrice());
