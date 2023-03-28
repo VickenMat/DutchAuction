@@ -1,26 +1,26 @@
-import { ReactElement } from 'react';
-import styled from 'styled-components';
-import { ActivateDeactivate } from './components/ActivateDeactivate';
-import { Greeter } from './components/Greeter';
-import { SectionDivider } from './components/SectionDivider';
-import { SignMessage } from './components/SignMessage';
-import { WalletStatus } from './components/WalletStatus';
+import React from 'react';
+import logo from './logo.svg';
+import './App.css';
 
-const StyledAppDiv = styled.div`
-  display: grid;
-  grid-gap: 20px;
-`;
-
-export function App(): ReactElement {
+function App() {
   return (
-    <StyledAppDiv>
-      <ActivateDeactivate />
-      <SectionDivider />
-      <WalletStatus />
-      <SectionDivider />
-      <SignMessage />
-      <SectionDivider />
-      <Greeter />
-    </StyledAppDiv>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.tsx</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
   );
 }
+
+export default App;
