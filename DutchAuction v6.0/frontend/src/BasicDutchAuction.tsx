@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { ethers, Contract, Signer } from 'ethers';
 import BDA_abi from './utils/BasicDutchAuction.json';
 // /Users/vicken/Desktop/Solidity Projects/GitHub Dutch Auction/DutchAuction v6.0/contracts/BasicDutchAuction
 
@@ -10,17 +10,10 @@ const signer = provider.getSigner();
 function App() {
 
   async function connect() {
-    
-  }
-  async function disconnect() {
-    
+     
   }
 
   async function deploy(){
-
-  }
-
-  async function info(){
 
   }
 
@@ -46,6 +39,14 @@ function App() {
     fetchData();
   }, []);
 
+  // current version just for testing
+  async function info(){
+    setReservePrice('100');
+    setNumBlocksAuctionOpen('10');
+    setOfferPriceDecrement('10');
+
+  }
+
   async function bid() {
     const auction = new ethers.Contract(contractAddress, BDA_abi.abi, signer);
     const bidTx = await auction.bid({value: currentPrice});
@@ -55,31 +56,41 @@ function App() {
     setWinner(await auction.getWinnerAddress());
   }
 
+  // async function disconnect() {
+    
+  // }
+
   return (
     <div>
       <center>
       <h1>Basic Dutch Auction</h1>
       <div>
         <h2>
-          <button disabled onClick={connect}>Connect</button>
-          <button disabled onClick={disconnect}>Disconnect</button>
+          <button onClick={connect}>Connect</button>
+          {/* <button disabled onClick={disconnect}>Disconnect</button> */}
         </h2>
       </div>
       <div>
-        <h2>Inputs</h2>
-        <p>Reserve Price: {reservePrice}</p>
-        <p>Number of Blocks Auction Open: {numBlocksAuctionOpen}</p>
-        <p>Offer Price Decrement: {offerPriceDecrement}</p>
+        <h2>Deployment</h2>
+        <p>Reserve Price {reservePrice}</p>
+        <input type = ""></input>
+        <p>Number of Blocks Auction Open for{numBlocksAuctionOpen}</p>
+        <input type = ""></input>
+        <p>Price Decrement {offerPriceDecrement}</p>
+        <input type = ""></input>
+        <p></p>
         <button disabled={isAuctionOpen} onClick={deploy}>Deploy</button>
-        <h2>General Information</h2>
+        <h2>Information</h2>
         <p>Auction Open: {isAuctionOpen ? 'Yes' : 'No'}</p>
         <p>Contract Address: </p>
         <button disabled={!isAuctionOpen} onClick={info}>Show Info</button>
         <div>
-        <h2>Bid Here</h2>
+        <h2>Bid</h2>
+        <input type = ""></input>
+        <p></p>
         <button disabled={!isAuctionOpen} onClick={bid}>Bid</button>
         </div>
-        <h2>Results</h2>
+        <h2>Result</h2>
         <p>Current Price: {currentPrice}</p>
         <p>Winner: {winner ? winner : 'None'}</p>
         <p>Seller: {seller}</p>
