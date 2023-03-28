@@ -19,9 +19,7 @@ contract BasicDutchAuction {
 
     uint256 blockStart;
     uint256 totalBids = 0;
-    uint256 refundAmount;
     bool public isAuctionOpen = true;
-    mapping(address => uint256) balances; // unused for now
 
     constructor(
         uint256 _reservePrice, // minimum amount of wei that the seller is willing to accept for the item

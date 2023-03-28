@@ -8,6 +8,22 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 
 function App() {
+
+  async function connect() {
+    
+  }
+  async function disconnect() {
+    
+  }
+
+  async function deploy(){
+
+  }
+
+  async function info(){
+
+  }
+
   const [reservePrice, setReservePrice] = useState('');
   const [numBlocksAuctionOpen, setNumBlocksAuctionOpen] = useState('');
   const [offerPriceDecrement, setOfferPriceDecrement] = useState('');
@@ -41,21 +57,34 @@ function App() {
 
   return (
     <div>
+      <center>
       <h1>Basic Dutch Auction</h1>
       <div>
-        <h2>Item Information</h2>
+        <h2>
+          <button disabled onClick={connect}>Connect</button>
+          <button disabled onClick={disconnect}>Disconnect</button>
+        </h2>
+      </div>
+      <div>
+        <h2>Inputs</h2>
         <p>Reserve Price: {reservePrice}</p>
         <p>Number of Blocks Auction Open: {numBlocksAuctionOpen}</p>
         <p>Offer Price Decrement: {offerPriceDecrement}</p>
-        <p>Current Price: {currentPrice}</p>
+        <button disabled={isAuctionOpen} onClick={deploy}>Deploy</button>
+        <h2>General Information</h2>
         <p>Auction Open: {isAuctionOpen ? 'Yes' : 'No'}</p>
+        <p>Contract Address: </p>
+        <button disabled={!isAuctionOpen} onClick={info}>Show Info</button>
+        <div>
+        <h2>Bid Here</h2>
+        <button disabled={!isAuctionOpen} onClick={bid}>Bid</button>
+        </div>
+        <h2>Results</h2>
+        <p>Current Price: {currentPrice}</p>
         <p>Winner: {winner ? winner : 'None'}</p>
         <p>Seller: {seller}</p>
       </div>
-      <div>
-        <h2>Bid Form</h2>
-        <button disabled={!isAuctionOpen} onClick={bid}>Bid</button>
-      </div>
+      </center>
     </div>
   );
 }
