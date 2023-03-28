@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import abi from './utils/BasicDutchAuction.json';
+import BDA_abi from './utils/BasicDutchAuction.json';
 // /Users/vicken/Desktop/Solidity Projects/GitHub Dutch Auction/DutchAuction v6.0/contracts/BasicDutchAuction
 
 const contractAddress = '0x...'; // Replace with the deployed contract address
@@ -18,7 +18,7 @@ function App() {
 
   useEffect(() => {
     async function fetchData() {
-      const auction = new ethers.Contract(contractAddress, abi.abi, provider);
+      const auction = new ethers.Contract(contractAddress, BDA_abi.abi, provider);
       setReservePrice(await auction.getReservePrice());
       setNumBlocksAuctionOpen(await auction.getNumBlocksAuctionOpen());
       setOfferPriceDecrement(await auction.getPriceDecrement());
@@ -31,7 +31,7 @@ function App() {
   }, []);
 
   async function bid() {
-    const auction = new ethers.Contract(contractAddress, abi.abi, signer);
+    const auction = new ethers.Contract(contractAddress, BDA_abi.abi, signer);
     const bidTx = await auction.bid({value: currentPrice});
     await bidTx.wait();
     setIsAuctionOpen(false);
