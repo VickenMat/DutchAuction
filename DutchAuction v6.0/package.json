@@ -9,5 +9,10 @@
     "hardhat": "^2.13.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
+  },
+  "dependencies": {
+    "@web3-react/core": "^6.1.9",
+    "@web3-react/injected-connector": "^6.0.7",
+    "styled-components": "^5.3.9"
   }
 }
