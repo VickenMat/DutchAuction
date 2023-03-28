@@ -24,11 +24,11 @@ describe("BasicDutchAuction Testing", function () {
     });
 
     describe("Checking Auction Parameters", function(){
-      it("logging addresses", async function () {
-        console.log("BasicDutchAuction Contract Address is",basicDutchAuctionToken.address);
-        console.log("Seller Address is",seller.address);
-        console.log("Winning Bidder(Account 1) Address is",account1.address);
-        console.log("2nd Bidder(Account 2) Address is",account2.address);
+      it("console logging addresses", async function () {
+        console.log("BasicDutchAuction Contract Address -",basicDutchAuctionToken.address);
+        console.log("Seller Address -",seller.address);
+        console.log("Winning Bidder(Account 1) Address -",account1.address);
+        console.log("2nd Bidder(Account 2) Address -",account2.address);
       });
       it("initial price - 200 wei", async function () {
         expect(await basicDutchAuctionToken.getCurrentPrice()).to.equal(200);
@@ -50,13 +50,10 @@ describe("BasicDutchAuction Testing", function () {
         it('is owner of this contract the seller', async function(){
           expect(await basicDutchAuctionToken.getSellerAddress()).to.equal(seller.address);
         });
-        // console.log("Account1 Balance", account1.balanceOf());
         it("is account1 wei balance greater than 0", async function () {
           expect(await basicDutchAuctionToken.balanceOf(account1.address)).to.lessThanOrEqual(0);
         });
         
-        //await nftDutchAuctionToken.connect(account).bid(400);
-
         describe("Checking Bidders/Bidding", function(){
           it('bid from seller account', async function(){
             expect(basicDutchAuctionToken.connect(seller).bid({value: 200})).to.be.revertedWith("Owner cannot submit bid on own item");
