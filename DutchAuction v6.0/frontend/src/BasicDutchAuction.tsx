@@ -2,29 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { ethers, Signer, Contract } from 'ethers';
 import BDA_abi from './utils/BasicDutchAuction.json';
 
-const contractAddress = '...'; // Replace with the deployed contract address
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
-// let address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 
 function App() {
-  // check if user is using metamask
-  // if(typeof window.ethereum !== 'undefined') {
-  // if(window.ethereum)
-  //   console.log('Web3 user detected');
-  // }
-  // else{
-  //   alert("please install metamask extension")
-  // }
   const [data, setdata] = useState({
     address:'',     // Stores address
     Balances: null  // Stores balance
   })
   const [connectedWallet, setConnectedAddress] = useState('')
   const [bal, setAddressBalance] = useState('')
-  const [contractAddress1, setContractAddress] = useState('')
+  const [contractAddress, setContractAddress] = useState('')
+  const [isWalletConnected, setIsWalletConnected] = useState(false)
 
-  const connect =() =>  {
+  // connect to wallet
+  const connect = () =>  {
+    if(window.ethereum)
+      alert('Web3 user detected');
+    else{
+      alert("Please install metamask extension")
+  }
     // connect wallet
     window.ethereum.request({method: 'eth_requestAccounts'})
     .then((result: any)=>{
@@ -32,6 +29,8 @@ function App() {
       setConnectedAddress(result);
       setBalance(result);
       setAuctionContractAddress(result);
+      setIsWalletConnected(true);
+      alert("Metamask wallet connected")
     })
     // function to get connected address's balance
     async function setBalance(connectedWallet:any){
@@ -53,13 +52,17 @@ function App() {
         params:[String(connectedWallet), 'latest']
       }).then((cAddress : any) => {
         setContractAddress(cAddress);
-        // return string value to convert it into int balances
-        console.log(cAddress)
       })
     }
   }
 
-  async function deploy(){
+  // disconnect from wallet
+  const disconnect = () =>  {
+
+  }
+
+  // deploy smart contract
+  const deploy = () =>  {
     // const [owner, address1, address2] = await ethers.getSigners();
     // seller1 = owner;
     // account1 = address1;
@@ -92,7 +95,7 @@ function App() {
   }, []);
 
   // current version just for testing
-  async function info(){
+  async function showInfo(){
     // setReservePrice('100');
     // setNumBlocksAuctionOpen('10');
     // setOfferPriceDecrement('10');
@@ -107,10 +110,6 @@ function App() {
     setWinner(await auction.getWinnerAddress());
   }
 
-  // async function disconnect() {
-    
-  // }
-
   return (
     <div>
       <center>
@@ -118,11 +117,11 @@ function App() {
       <div>
         <h2>
           <button onClick={connect}>Connect</button>
-          {/* <button disabled onClick={disconnect}>Disconnect</button> */}
+          <button disabled={!isWalletConnected} onClick={disconnect}>Disconnect</button>
         </h2>
           <p>Connected Wallet Address <br></br>{connectedWallet}</p>
           <p>Wallet Balance <br></br>{bal}</p>
-          <p>Contract Address <br></br>{contractAddress1}</p>
+          <p>Contract Address <br></br>{contractAddress}</p>
       </div>
       <div>
         <h2>Deployment</h2>
@@ -135,9 +134,11 @@ function App() {
         <p></p>
         <button disabled={isAuctionOpen} onClick={deploy}>Deploy</button>
         <h2>Information</h2>
-        <p>Auction Open: {isAuctionOpen ? 'Yes' : 'No'}</p>
-        <p>Contract Address: </p>
-        <button disabled={!isAuctionOpen} onClick={info}>Show Info</button>
+        <button disabled={!isAuctionOpen} onClick={showInfo}>Show Info</button>
+          <p>Auction Open: {isAuctionOpen ? 'Yes' : 'No'}</p>
+          <p>Reserve Price <br></br>{}</p>
+          <p>Number of Blocks Auction Open for <br></br>{}</p>
+          <p>Price Decrement <br></br>{}</p>
         <div>
         <h2>Bid</h2>
         <input type = ""></input>
