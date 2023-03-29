@@ -14,7 +14,7 @@ contract BasicDutchAuction {
     uint256 immutable offerPriceDecrement;
     uint256 immutable initialPrice;
 
-    address seller;
+    address public seller;
     address public winner;
 
     uint256 blockStart;
