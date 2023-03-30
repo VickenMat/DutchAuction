@@ -12,20 +12,24 @@ function App() {
   const [reservePrice, setReservePrice] = useState('');
   const [numBlocksAuctionOpen, setNumBlocksAuctionOpen] = useState('');
   const [offerPriceDecrement, setOfferPriceDecrement] = useState('');
-  const [currentPrice, setCurrentPrice] = useState('');
+  const [currentPrice, setCurrentPrice] = useState(0);
   const [isAuctionOpen, setIsAuctionOpen] = useState(false);
   const [winner, setWinner] = useState('');
   const [seller, setSeller] = useState('');
 
   const [connectedWallet, setConnectedAddress] = useState('')
-  const [bal, setAddressBalance] = useState('')
-  const [contractAddress, setContractAddress] = useState('')
+  const [bal, setAddressBalance] = useState(0)
+  const [contractAddress, setContractAddress] = useState("")
   const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [constructorArgs, setConstructorParameter] = useState({
     reservePrice: '',
     numBlocksAuctionOpen: '',
     offerPriceDecrement: '',
   })
+
+  const [showReservePrice, setShowReservePrice] = useState(0);
+  const [shownumBlock, setShowNumBlock] = useState(0);
+  const [showOD, setShowOD] = useState(0);
 
   // check connection to wallet
   const connect = () =>  {
@@ -48,7 +52,7 @@ function App() {
       method:'eth_getBalance',
       params:[String(connectedWallet), 'latest']
     }).then((balance : any) => {
-      setAddressBalance(ethers.utils.formatEther(balance));
+      setAddressBalance(parseInt(ethers.utils.formatEther(balance)));
       // console.log(balance)
       console.log(ethers.utils.formatEther(balance))
     })
@@ -72,6 +76,7 @@ function App() {
     console.log('Provider created');
     const signer = provider.getSigner(); 
     console.log('Signer created');
+
     const AuctionFactory = new ethers.ContractFactory(auction_abi, bytecode, signer);   
     console.log('AuctionFactory created: ',AuctionFactory);
     console.log(constructorArgs.reservePrice, constructorArgs.numBlocksAuctionOpen, constructorArgs.offerPriceDecrement);
@@ -80,6 +85,7 @@ function App() {
     setContractAddress(AuctionToken.address);
     await AuctionToken.deployed();
     console.log('Auction successfully deployed with requested parameters');
+    console.log(AuctionToken)
     let currentPrice = await AuctionToken.getCurrentPrice();
     setCurrentPrice(currentPrice.toNumber());
     console.log('Current price is',currentPrice.toNumber());
@@ -88,30 +94,48 @@ function App() {
   }
 
   async function showInfo(){
+    const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+    console.log('t1')
+    const contract = new ethers.Contract(contractAddress, auction_abi, provider)
+    console.log('t2')
+    console.log(contract)
+    const sellerAdd = await contract.getSellerAddress();
+    console.log('t3')
+    setSeller(sellerAdd);
+    const resPrice = await contract.getReservePrice();
+    console.log('t3')
+    setShowReservePrice(parseInt(resPrice));
+    console.log('t3')
+    const numBlock = await contract.getNumBlocksAuctionOpen();
+    setShowNumBlock(parseInt(numBlock));
+    const offerDec = await contract.getPriceDecrement();
+    setShowOD(parseInt(offerDec));
+    const currPrice = await contract.getCurrentPrice();
+    setCurrentPrice(parseInt(currPrice,10));
+    // const reservePrice = await contract.reservePrice(); 
     console.log('Auction State:',isAuctionOpen);
     console.log('Contract Address:', contractAddress);
     console.log('Current Price:',currentPrice);
     console.log('Parameters:',constructorArgs.reservePrice, constructorArgs.numBlocksAuctionOpen, constructorArgs.offerPriceDecrement);
   }
 
-  const [bidAmount, setBidAmount] = useState('');
+  const [bidAmount, setBidAmount] = useState(0);
   
   const bid = async(e:any) =>{
     const bidAmount1 = document.getElementById('bidAmount') as HTMLInputElement;
-    const bidVal = bidAmount1.value;
+    const bidVal = parseInt(bidAmount1.value);
     setBidAmount(bidVal);
     console.log(bidAmount);
 
-    // const accounts = await Web3.eth.getAccounts();
-    // const result = await deployBasicDutchAuction.bid().send({
-    //   from: accounts[0],
-    //   value: currentPrice,
-    // });
-    // console.log(result);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner(); 
 
+    const contract = new ethers.Contract(
+      contractAddress, auction_abi, signer)
+
+    
     if(bidAmount > currentPrice && bidAmount < bal){
-      // setBidAmount(bidAmount);
-      const tx = AuctionToken.bid(bidAmount);
+      const tx = contract.bid({value: bidAmount});
       setWinner(winner);
       setIsAuctionOpen(false);
       alert('Successful bid')
@@ -161,26 +185,31 @@ function App() {
         <button disabled={isAuctionOpen} onClick={deployBasicDutchAuction}>Deploy</button>
       </div>
       <div>
+        <h2>Contract Address</h2>
+      <input type = 'text' name = 'contractAddress' placeholder = "enter contract address from buyer's account" /><br></br>
+      </div>
+      <div>
         <h2>Information</h2>
-        <button disabled={!isAuctionOpen} onClick={showInfo}>Show Info</button>
+        <button onClick={showInfo}>Show Info</button>
           <p>Auction Open: {isAuctionOpen ? 'Yes' : 'No'}</p>
           <p>Contract Address: {contractAddress}</p>
+          <p>Seller Address: {seller}</p>
           <p>Current Price: {currentPrice}</p>
-          <p>Reserve Price: {constructorArgs.reservePrice}</p>
-          <p>Number of Blocks Auction Open for: {constructorArgs.numBlocksAuctionOpen}</p>
-          <p>Price Decrement: {constructorArgs.offerPriceDecrement}</p>
+          <p>Reserve Price: {showReservePrice}</p>
+          <p>Number of Blocks Auction Open for: {shownumBlock}</p>
+          <p>Price Decrement: {showOD}</p>
         <div>
         <h2>Bid</h2>
         <label htmlFor="Bid Amount"></label> <input type = 'text' defaultValue={bidAmount} id = 'bidAmount' placeholder = "enter bid" />
         
         <p></p>
-        <button disabled={!isAuctionOpen} onClick={bid}>Bid</button>
+        <button onClick={bid}>Bid</button>
         </div>
         <h2>Result</h2>
         <p>Current Price: {currentPrice}</p>
         <p>Winning Bid Amount: {bidAmount}</p>
         <p>Winner: {winner ? winner : 'None'}</p>
-        <p>Seller: {seller}</p>
+        <p>Seller: {connectedWallet}</p>
       </div>
       </center>
     </div>
