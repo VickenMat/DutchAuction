@@ -1,3 +1,5 @@
+DutchAuction v6.0
+
 (base) vicken@Vickens-MacBook-Air DutchAuction v6.0 % yarn hardhat compile
 yarn run v1.22.19
 $ '/Users/vicken/Desktop/Solidity Projects/GitHub Dutch Auction/DutchAuction v6.0/node_modules/.bin/hardhat' compile
@@ -43,6 +45,9 @@ Checking Bidders/Bidding
 File % Stmts % Branch % Funcs % Lines Uncovered Lines
 contracts/ 95.83 59.09 100 97.06
 BasicDutchAuction.sol 95.83 59.09 100 97.06 121
------------------------- ---------- ---------- ---------- ---------- ----------------
+
+---
+
 All files 95.83 59.09 100 97.06
------------------------- ---------- ---------- ---------- ---------- ----------------
+
+---
