@@ -72,9 +72,10 @@ function App() {
     console.log('Provider created');
     const signer = provider.getSigner(); 
     console.log('Signer created');
-    const AuctionFactory = new ethers.Contract(auction_abi, bytecode_real, signer);    
+    const AuctionFactory = new ethers.Contract(contractAddress, auction_abi, signer);  
+    // const AuctionFactory = new ethers.Contract(auction_abi, bytecode_real, signer);   
     console.log('AuctionFactory created');
-    const AuctionToken = await AuctionFactory.deploy(100, 10, 10);
+    const AuctionToken = await AuctionFactory.deploy(constructorArgs);
     console.log('AuctionToken created');
     setContractAddress(contractAddress);
     console.log('Contract Address set');
