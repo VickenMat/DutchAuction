@@ -1,0 +1,11 @@
+{
+  "name": "v6.0Test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "hardhat": "^2.13.0",
+    "typescript": "^5.0.2"
+  }
+}
