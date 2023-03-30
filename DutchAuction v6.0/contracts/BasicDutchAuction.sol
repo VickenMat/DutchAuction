@@ -9,10 +9,10 @@
 pragma solidity ^0.8.17;
 
 contract BasicDutchAuction {
-    uint256 immutable reservePrice;
-    uint256 immutable numBlocksAuctionOpen;
-    uint256 immutable offerPriceDecrement;
-    uint256 immutable initialPrice;
+    uint256 public immutable reservePrice;
+    uint256 public immutable numBlocksAuctionOpen;
+    uint256 public immutable offerPriceDecrement;
+    uint256 public immutable initialPrice;
 
     address public seller;
     address public winner;
