@@ -1,4 +1,8 @@
-DutchAuction v6.0
+DutchAuction v7.0
+
+http://k51qzi5uqu5dkb41dqtct70lc1g0n9s4qo7tugkx473jh6i5ko115bjun5989r.ipns.localhost:8080/
+
+Version 7 connects the contract to IPFS and allows for bidding with the Sepolia and Goerli testnet
 
 (base) vicken@Vickens-MacBook-Air DutchAuction v6.0 % yarn hardhat compile
 yarn run v1.22.19
@@ -6,10 +10,6 @@ $ '/Users/vicken/Desktop/Solidity Projects/GitHub Dutch Auction/DutchAuction v6.
 Nothing to compile
 No need to generate any newer typings.
 ✨ Done in 0.80s.
-
-(base) vicken@Vickens-MacBook-Air DutchAuction v6.0 % yarn hardhat test
-yarn run v1.22.19
-$ '/Users/vicken/Desktop/Solidity Projects/GitHub Dutch Auction/DutchAuction v6.0/node_modules/.bin/hardhat' test
 
 BasicDutchAuction Testing
 Checking Auction Parameters
@@ -40,14 +40,4 @@ Checking Bidders/Bidding
 
 17 passing (2s)
 
-✨ Done in 3.24s.
-
-File % Stmts % Branch % Funcs % Lines Uncovered Lines
-contracts/ 95.83 59.09 100 97.06
-BasicDutchAuction.sol 95.83 59.09 100 97.06 121
-
----
-
-All files 95.83 59.09 100 97.06
-
----
+✨ Done in 3.08s.
